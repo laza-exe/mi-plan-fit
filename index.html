@@ -272,26 +272,27 @@
     document.getElementById("semanaCompletadas").innerText = total;
   }
 
-  let ejerciciosCalendario = {}; // Variable global para almacenar los ejercicios del calendario
+  // >>> INICIO DE CAMBIOS PARA INTEGRAR CON editar_dias.html <<<
+  let planEntrenamientoIndex = JSON.parse(localStorage.getItem("planEntrenamiento") || "{}");
+  let ejerciciosCalendario = {}; // Variable global para almacenar todos los ejercicios de todos los días
 
   function cargarEjerciciosDias() {
-    const ejerciciosGuardados = JSON.parse(localStorage.getItem("ejerciciosDias") || "{}");
+    // Buscar los días por defecto (Día 1, Día 2, Día 3) en el nuevo planEntrenamiento
+    // Usamos Object.values para iterar sobre los objetos de día sin preocuparnos por sus IDs dinámicos
+    const d1 = Object.values(planEntrenamientoIndex).find(day => day.name.toLowerCase().includes("día 1") || day.name.toLowerCase().includes("dia 1"));
+    const d2 = Object.values(planEntrenamientoIndex).find(day => day.name.toLowerCase().includes("día 2") || day.name.toLowerCase().includes("dia 2"));
+    const d3 = Object.values(planEntrenamientoIndex).find(day => day.name.toLowerCase().includes("día 3") || day.name.toLowerCase().includes("dia 3"));
 
-    // Valores por defecto si no hay nada guardado
-    const ejD1 = ejerciciosGuardados.d1 && ejerciciosGuardados.d1.length > 0 ? ejerciciosGuardados.d1 : ["Peso muerto rumano", "Dominadas asistidas", "Press inclinado", "Plancha", "Bird-dogs"];
-    const ejD2 = ejerciciosGuardados.d2 && ejerciciosGuardados.d2.length > 0 ? ejerciciosGuardados.d2 : ["Sentadilla goblet", "Remo con barra", "Z-Press", "Plancha reach", "Hollow hold"];
-    const ejD3 = ejerciciosGuardados.d3 && ejerciciosGuardados.d3.length > 0 ? ejerciciosGuardados.d3 : ["Caminata inclinada", "2 abdominales a elección", "Movilidad 10 min"];
+    document.getElementById("ejD1").innerHTML = d1 ? d1.ejercicios.map(ej => `<li>${ej}</li>`).join("") : '<li>No configurado (configura en "Editar Ejercicios Diarios")</li>';
+    document.getElementById("ejD2").innerHTML = d2 ? d2.ejercicios.map(ej => `<li>${ej}</li>`).join("") : '<li>No configurado (configura en "Editar Ejercicios Diarios")</li>';
+    document.getElementById("ejD3").innerHTML = d3 ? d3.ejercicios.map(ej => `<li>${ej}</li>`).join("") : '<li>No configurado (configura en "Editar Ejercicios Diarios")</li>';
 
-    document.getElementById("ejD1").innerHTML = ejD1.map(ej => `<li>${ej}</li>`).join("");
-    document.getElementById("ejD2").innerHTML = ejD2.map(ej => `<li>${ej}</li>`).join("");
-    document.getElementById("ejD3").innerHTML = ejD3.map(ej => `<li>${ej}</li>`).join("");
-
-    // Almacenar en la variable global para selección
-    ejerciciosCalendario = {
-        d1: ejD1,
-        d2: ejD2,
-        d3: ejD3
-    };
+    // Almacenar en la variable global para selección (todos los ejercicios de todos los días)
+    const allExercisesForSelection = [];
+    Object.values(planEntrenamientoIndex).forEach(day => {
+        if (day.ejercicios) allExercisesForSelection.push(...day.ejercicios);
+    });
+    ejerciciosCalendario = allExercisesForSelection; // Ahora contiene todos los ejercicios de todos los días
     populateCalendarExercisesDropdown();
   }
 
@@ -299,13 +300,8 @@
       const select = document.getElementById("selectEjercicioCalendario");
       select.innerHTML = '<option value="">Selecciona un ejercicio...</option>'; // Reset
       
-      const allExercises = [];
-      if (ejerciciosCalendario.d1) allExercises.push(...ejerciciosCalendario.d1);
-      if (ejerciciosCalendario.d2) allExercises.push(...ejerciciosCalendario.d2);
-      if (ejerciciosCalendario.d3) allExercises.push(...ejerciciosCalendario.d3);
-
-      // Eliminar duplicados y ordenar
-      const uniqueExercises = [...new Set(allExercises)].sort();
+      // Eliminar duplicados y ordenar del listado global de ejerciciosCalendario
+      const uniqueExercises = [...new Set(ejerciciosCalendario)].sort();
 
       uniqueExercises.forEach(ej => {
           const option = document.createElement("option");
@@ -314,6 +310,8 @@
           select.appendChild(option);
       });
   }
+  // >>> FIN DE CAMBIOS PARA INTEGRAR CON editar_dias.html <<<
+
 
   // --- Funciones de Seguimiento de Peso ---
   let pesos = JSON.parse(localStorage.getItem("peso_historial") || "[]");
@@ -693,7 +691,13 @@
   // --- Inicialización al Cargar la Página ---
   document.addEventListener('DOMContentLoaded', () => {
     cargarChecks();
-    cargarEjerciciosDias(); // Esto también poblará el select de ejercicios del calendario
+    
+    // >>> INICIO DE CAMBIOS PARA INTEGRAR CON editar_dias.html <<<
+    // Asegurarse de que planEntrenamientoIndex se cargue al inicio de index.html
+    planEntrenamientoIndex = JSON.parse(localStorage.getItem("planEntrenamiento") || "{}");
+    cargarEjerciciosDias(); // Asegura que los ejercicios del calendario se cargan de la nueva estructura
+    // >>> FIN DE CAMBIOS PARA INTEGRAR CON editar_dias.html <<<
+
     displayPesoHistory();
     cargarEjerciciosTablaActualTemp(); // Cargar la tabla de ejercicios actual (no el historial)
     populateExerciseHistoryDropdown(); // Cargar el historial de ejercicios
