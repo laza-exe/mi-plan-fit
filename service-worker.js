@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mi-plan-fit-cache-v1';
+const CACHE_NAME = 'mi-plan-fit-cache-v2'; // Cambiado a v2 para asegurar que se actualice la caché
 const urlsToCache = [
   '/',
   'index.html',
@@ -7,7 +7,8 @@ const urlsToCache = [
   'service-worker.js',
   'icon-192x192.png',
   'icon-512x512.png',
-  'https://fonts.googleapis.com/css?family=Inter:400,600&display=swap' // La fuente de Google Fonts
+  'https://fonts.googleapis.com/css?family=Inter:400,600&display=swap', // La fuente de Google Fonts
+  'https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js' // ¡Nuevo! Chart.js
 ];
 
 self.addEventListener('install', event => {

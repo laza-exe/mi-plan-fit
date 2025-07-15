@@ -13,6 +13,18 @@
             --accent: #aac6b8;
             --text: #333333;
             --danger: #dc3545;
+            --border: #e0e0e0; /* Nuevo para consistencia con index.html */
+            --input-bg: #ffffff; /* Nuevo para consistencia con index.html */
+        }
+        body.dark-mode { /* Añadido para que editar_dias también respete el modo oscuro */
+            --bg: #1a1a2e;
+            --card: #20203a;
+            --primary: #8aafff;
+            --accent: #5e8b7e;
+            --text: #e0e0e0;
+            --danger: #f44336;
+            --border: #44445c;
+            --input-bg: #2a2a40;
         }
         body {
             margin: 0;
@@ -20,6 +32,7 @@
             background: var(--bg);
             color: var(--text);
             padding: 1rem;
+            transition: background-color 0.3s, color 0.3s; /* Transición para modo oscuro */
         }
         .section {
             background: var(--card);
@@ -27,6 +40,7 @@
             padding: 1rem;
             margin-bottom: 1.5rem;
             box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            transition: background-color 0.3s, box-shadow 0.3s;
         }
         h1, h2, h3 {
             color: var(--primary);
@@ -36,9 +50,12 @@
             padding: 0.6rem;
             margin-bottom: 0.5rem;
             border-radius: 0.6rem;
-            border: 1px solid #ccc;
+            border: 1px solid var(--border); /* Uso de variable */
             font-size: 1rem;
             box-sizing: border-box;
+            background-color: var(--input-bg); /* Uso de variable */
+            color: var(--text); /* Uso de variable */
+            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
         }
         ul {
             list-style: none;
@@ -52,19 +69,25 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap; /* Permite que los botones bajen si no hay espacio */
+            flex-wrap: wrap;
+        }
+        body.dark-mode ul li { /* Estilo para modo oscuro */
+            background: #3a3a5a;
         }
         ul li span[contenteditable="true"] {
             flex-grow: 1;
             margin-right: 0.5rem;
-            min-width: 150px; /* Asegura espacio para editar */
+            min-width: 150px;
             padding: 0.2rem;
-            border: 1px solid transparent; /* Para simular input */
+            border: 1px solid transparent;
             border-radius: 4px;
         }
         ul li span[contenteditable="true"]:focus {
             border: 1px solid var(--primary);
             background-color: #e6f0f5;
+        }
+        body.dark-mode ul li span[contenteditable="true"]:focus {
+            background-color: #4a4a7a;
         }
         .add-btn, .save-btn, .back-btn, .manage-btn {
             background: var(--primary);
@@ -76,6 +99,7 @@
             font-weight: bold;
             margin-top: 1rem;
             width: 100%;
+            transition: background-color 0.3s ease, filter 0.3s;
         }
         .delete-btn, .remove-day-btn {
             background: var(--danger);
@@ -86,12 +110,15 @@
             cursor: pointer;
             font-weight: bold;
             margin-left: 0.5rem;
+            transition: background-color 0.3s ease, filter 0.3s;
         }
         .add-btn:hover, .save-btn:hover, .manage-btn:hover {
             background-color: #6a92b0;
+            filter: brightness(110%);
         }
         .delete-btn:hover, .remove-day-btn:hover {
             background-color: #c82333;
+            filter: brightness(110%);
         }
         .back-btn {
             background: var(--accent);
@@ -101,32 +128,41 @@
         }
         .back-btn:hover {
             background-color: #9ab6a8;
+            filter: brightness(110%);
         }
         .tab-buttons {
             display: flex;
-            flex-wrap: wrap; /* Permite que los botones de día se envuelvan */
+            flex-wrap: wrap;
             margin-bottom: 1rem;
-            gap: 0.5rem; /* Espacio entre botones */
+            gap: 0.5rem;
         }
         .tab-buttons button {
-            flex-grow: 1; /* Permite que los botones crezcan */
+            flex-grow: 1;
             padding: 0.8rem;
-            border: 1px solid #ccc;
+            border: 1px solid var(--border); /* Uso de variable */
             background: #eee;
             cursor: pointer;
             font-weight: bold;
-            border-radius: 0.6rem; /* Bordes redondeados para cada botón */
+            border-radius: 0.6rem;
             margin-bottom: 0;
-            min-width: 80px; /* Ancho mínimo para los botones de día */
+            min-width: 80px;
+            color: var(--text); /* Asegura que el texto sea legible en claro/oscuro */
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
+        }
+        body.dark-mode .tab-buttons button {
+            background: #2a2a40;
+            border-color: var(--border);
+            color: var(--text);
         }
         .tab-buttons button.active {
             background: var(--primary);
             color: white;
         }
         .tab-content {
-            border: 1px solid #ccc;
+            border: 1px solid var(--border); /* Uso de variable */
             padding: 1rem;
             border-radius: 0.6rem;
+            transition: border-color 0.3s;
         }
         .day-header {
             display: flex;
@@ -142,25 +178,28 @@
         }
         .add-from-master select {
             flex-grow: 1;
-            margin-bottom: 0; /* Anula margen de input general */
+            margin-bottom: 0;
         }
         .add-from-master button {
             width: auto;
             padding: 0.6rem 1rem;
-            margin-top: 0; /* Anula margen de botón general */
+            margin-top: 0;
         }
-        /* Estilos para la sección de Master List */
         .master-list ul {
-            max-height: 200px; /* Limita la altura del scroll */
+            max-height: 200px;
             overflow-y: auto;
-            border: 1px solid #eee;
+            border: 1px solid var(--border); /* Uso de variable */
             border-radius: 0.6rem;
             padding: 0.5rem;
             background-color: #f9f9f9;
+            transition: border-color 0.3s, background-color 0.3s;
+        }
+        body.dark-mode .master-list ul {
+            background-color: #2a2a40;
         }
         .master-list li {
-            background: none; /* Eliminar fondo de lista de ejercicios */
-            border-bottom: 1px dashed #e0e0e0;
+            background: none;
+            border-bottom: 1px dashed var(--border); /* Uso de variable */
             margin-bottom: 0;
             border-radius: 0;
         }
@@ -211,6 +250,13 @@
         let planEntrenamiento = JSON.parse(localStorage.getItem("planEntrenamiento") || "{}");
         let masterExercises = JSON.parse(localStorage.getItem("masterExercises") || "[]");
 
+        // --- Dark Mode Initialization for this page ---
+        if (localStorage.getItem('darkMode') === 'enabled') {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+
         // Funciones para gestionar el Listado Maestro de Ejercicios
         function loadMasterExercises(filterText = '') {
             const ul = document.getElementById("masterExerciseList");
@@ -255,19 +301,18 @@
             newText = newText.trim();
             if (masterExercises[index] !== undefined) {
                 if (newText) {
-                    // Check if the new name already exists, excluding the current item
                     const isDuplicate = masterExercises.some((ej, i) => i !== index && ej === newText);
                     if (isDuplicate) {
                         alert("Ya existe un ejercicio con ese nombre.");
-                        loadMasterExercises(); // Recarga para volver al valor original
+                        loadMasterExercises();
                     } else {
                         masterExercises[index] = newText;
                         saveMasterExercises();
-                        loadMasterExercises(); // Recarga para ordenar y refrescar la vista
+                        loadMasterExercises();
                     }
                 } else {
                     alert("El nombre del ejercicio no puede estar vacío. Borra la entrada si no la quieres.");
-                    loadMasterExercises(); // Recarga para volver al valor original
+                    loadMasterExercises();
                 }
             }
         }
@@ -281,7 +326,6 @@
         }
 
         function saveMasterExercises() {
-            // Asegurarse de que no haya duplicados y ordenar antes de guardar
             masterExercises = [...new Set(masterExercises)].sort((a, b) => a.localeCompare(b));
             localStorage.setItem("masterExercises", JSON.stringify(masterExercises));
         }
@@ -296,10 +340,9 @@
         }
 
         // Funciones para gestionar los Días de Entrenamiento
-        let activeDayId = null; // Para saber qué día está activo
+        let activeDayId = null;
 
         function generateDayId(name) {
-            // Genera un ID único basado en el nombre y un timestamp para evitar colisiones
             return name.toLowerCase().replace(/\s/g, '-') + '-' + Date.now();
         }
 
@@ -310,11 +353,10 @@
             dayContentsContainer.innerHTML = "";
 
             const dayKeys = Object.keys(planEntrenamiento).sort((a,b) => {
-                // Ordenar por el número de día si el formato es "día X - ..."
                 const numA = parseInt(a.match(/day-(\d+)/)?.[1]);
                 const numB = parseInt(b.match(/day-(\d+)/)?.[1]);
                 if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-                return a.localeCompare(b); // Orden alfabético si no es un día numerado
+                return a.localeCompare(b);
             });
 
             if (dayKeys.length === 0) {
@@ -326,18 +368,16 @@
             dayKeys.forEach(dayId => {
                 const dayData = planEntrenamiento[dayId];
 
-                // Crear botón de pestaña para el día
                 const button = document.createElement("button");
                 button.textContent = dayData.name;
                 button.id = `tab-${dayId}`;
                 button.onclick = () => showDay(dayId);
                 dayTabsContainer.appendChild(button);
 
-                // Crear contenedor de contenido para el día
                 const contentDiv = document.createElement("div");
                 contentDiv.id = `content-${dayId}`;
                 contentDiv.classList.add("tab-content");
-                contentDiv.style.display = 'none'; // Ocultar por defecto
+                contentDiv.style.display = 'none';
 
                 contentDiv.innerHTML = `
                     <div class="day-header">
@@ -359,7 +399,6 @@
                 dayContentsContainer.appendChild(contentDiv);
             });
 
-            // Mostrar el primer día o el último activo
             if (!activeDayId || !planEntrenamiento[activeDayId]) {
                 activeDayId = dayKeys[0];
             }
@@ -367,19 +406,16 @@
         }
 
         function showDay(dayId) {
-            // Ocultar pestaña anterior
             if (activeDayId && document.getElementById(`content-${activeDayId}`)) {
                 document.getElementById(`content-${activeDayId}`).style.display = 'none';
                 document.getElementById(`tab-${activeDayId}`).classList.remove('active');
             }
 
-            activeDayId = dayId; // Establecer el nuevo día activo
+            activeDayId = dayId;
 
-            // Mostrar nueva pestaña
             document.getElementById(`content-${activeDayId}`).style.display = 'block';
             document.getElementById(`tab-${activeDayId}`).classList.add('active');
 
-            // Cargar ejercicios específicos para el día activo
             loadEjerciciosForDay(activeDayId);
         }
 
@@ -392,7 +428,6 @@
                 return;
             }
 
-            // Generar un ID incremental si el nombre es "Día X"
             let dayId;
             const existingDayNumbers = Object.keys(planEntrenamiento)
                                         .map(id => parseInt(id.match(/day-(\d+)/)?.[1]))
@@ -401,7 +436,6 @@
 
             if (newDayName.toLowerCase().startsWith("día") || newDayName.toLowerCase().startsWith("dia")) {
                  dayId = `day-${nextDayNumber}`;
-                 // Actualizar el nombre para que coincida si el usuario solo puso "Día X"
                  if (!newDayName.toLowerCase().includes(nextDayNumber.toString())) {
                     newDayName = `Día ${nextDayNumber}`;
                  }
@@ -409,7 +443,6 @@
                 dayId = generateDayId(newDayName);
             }
             
-            // Comprobar si el nombre del día ya existe
             const nameExists = Object.values(planEntrenamiento).some(day => day.name === newDayName);
             if (nameExists) {
                 alert(`Ya existe un día con el nombre "${newDayName}". Por favor, elige otro nombre.`);
@@ -422,8 +455,8 @@
             };
             savePlan();
             newDayNameInput.value = "";
-            loadDays(); // Recarga todos los días para mostrar el nuevo
-            showDay(dayId); // Muestra el nuevo día
+            loadDays();
+            showDay(dayId);
         }
 
         function confirmRemoveDay(dayId, dayName) {
@@ -435,9 +468,8 @@
         function removeDay(dayId) {
             delete planEntrenamiento[dayId];
             savePlan();
-            loadDays(); // Recarga todos los días
+            loadDays();
 
-            // Si el día activo era el borrado, selecciona el primero disponible
             const dayKeys = Object.keys(planEntrenamiento);
             if (dayKeys.length > 0) {
                 showDay(dayKeys[0]);
@@ -449,7 +481,7 @@
 
         function loadEjerciciosForDay(dayId) {
             const ul = document.getElementById(`listaEjercicios-${dayId}`);
-            if (!ul) return; // Asegurarse de que el UL existe
+            if (!ul) return;
             ul.innerHTML = "";
             const currentEjercicios = planEntrenamiento[dayId] ? planEntrenamiento[dayId].ejercicios : [];
 
@@ -468,7 +500,7 @@
             const newEj = input.value.trim();
             if (newEj) {
                 if (!planEntrenamiento[dayId]) {
-                    planEntrenamiento[dayId] = { name: "Nuevo Día", ejercicios: [] }; // Fallback si el día no existe
+                    planEntrenamiento[dayId] = { name: "Nuevo Día", ejercicios: [] };
                 }
                 planEntrenamiento[dayId].ejercicios.push(newEj);
                 input.value = "";
@@ -484,14 +516,14 @@
                 if (!planEntrenamiento[dayId]) {
                     planEntrenamiento[dayId] = { name: "Nuevo Día", ejercicios: [] };
                 }
-                if (!planEntrenamiento[dayId].ejercicios.includes(selectedExercise)) { // Evitar duplicados en el día
+                if (!planEntrenamiento[dayId].ejercicios.includes(selectedExercise)) {
                     planEntrenamiento[dayId].ejercicios.push(selectedExercise);
                     loadEjerciciosForDay(dayId);
                     savePlan();
                 } else {
                     alert("Este ejercicio ya está en la lista de este día.");
                 }
-                select.value = ""; // Resetear el selector
+                select.value = "";
             } else {
                 alert("Por favor, selecciona un ejercicio del listado maestro.");
             }
@@ -504,7 +536,7 @@
                     planEntrenamiento[dayId].ejercicios[index] = newText;
                 } else {
                     alert("El nombre del ejercicio no puede estar vacío. Bórralo si no lo necesitas.");
-                    loadEjerciciosForDay(dayId); // Recargar para mostrar el valor original
+                    loadEjerciciosForDay(dayId);
                 }
                 savePlan();
             }
@@ -519,17 +551,13 @@
         }
 
         function saveDayChanges(dayId) {
-            // La función updateEjercicioForDay y addEjercicio ya llaman a savePlan()
-            // Esto es más bien un botón de confirmación visual para el usuario
             savePlan();
             alert(`Cambios para ${planEntrenamiento[dayId].name} guardados.`);
         }
 
         function savePlan() {
             localStorage.setItem("planEntrenamiento", JSON.stringify(planEntrenamiento));
-            // Asegúrate de que index.html se actualice, se hará al recargar
         }
-
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
@@ -554,8 +582,8 @@
                 saveMasterExercises();
             }
 
-            loadMasterExercises(); // Carga el listado maestro
-            loadDays(); // Carga todos los días de entrenamiento
+            loadMasterExercises();
+            loadDays();
         });
     </script>
 </body>
