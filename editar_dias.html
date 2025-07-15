@@ -173,6 +173,9 @@
         .master-list input[type="text"] {
             margin-top: 0.5rem;
         }
+        .master-list-search {
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -193,6 +196,7 @@
     <div class="section">
         <h2>📚 Listado Maestro de Ejercicios</h2>
         <div class="master-list">
+            <input type="text" id="masterExerciseSearch" class="master-list-search" placeholder="Buscar ejercicio maestro..." onkeyup="filterMasterExercises()">
             <ul id="masterExerciseList">
                 </ul>
             <input type="text" id="newMasterExercise" placeholder="Añadir nuevo ejercicio maestro">
@@ -208,44 +212,63 @@
         let masterExercises = JSON.parse(localStorage.getItem("masterExercises") || "[]");
 
         // Funciones para gestionar el Listado Maestro de Ejercicios
-        function loadMasterExercises() {
+        function loadMasterExercises(filterText = '') {
             const ul = document.getElementById("masterExerciseList");
             ul.innerHTML = "";
-            masterExercises.forEach((ej, index) => {
+            const filteredExercises = masterExercises.filter(ej => 
+                ej.toLowerCase().includes(filterText.toLowerCase())
+            );
+
+            filteredExercises.forEach((ej, index) => {
+                // Hay que encontrar el índice original para las funciones de edición/borrado
+                const originalIndex = masterExercises.indexOf(ej); 
                 const li = document.createElement("li");
                 li.innerHTML = `
-                    <span contenteditable="true" onblur="updateMasterExercise(${index}, this.innerText)">${ej}</span>
-                    <button class="delete-btn" onclick="deleteMasterExercise(${index})">🗑</button>
+                    <span contenteditable="true" onblur="updateMasterExercise(${originalIndex}, this.innerText)">${ej}</span>
+                    <button class="delete-btn" onclick="deleteMasterExercise(${originalIndex})">🗑</button>
                 `;
                 ul.appendChild(li);
             });
         }
 
+        function filterMasterExercises() {
+            const searchText = document.getElementById("masterExerciseSearch").value;
+            loadMasterExercises(searchText);
+        }
+
         function addMasterExercise() {
             const input = document.getElementById("newMasterExercise");
             const newEj = input.value.trim();
-            if (newEj && !masterExercises.includes(newEj)) { // Evitar duplicados
-                masterExercises.push(newEj);
-                input.value = "";
-                saveMasterExercises();
-                loadMasterExercises();
-            } else if (masterExercises.includes(newEj)) {
-                alert("Ese ejercicio ya existe en el listado maestro.");
+            if (newEj) {
+                if (!masterExercises.includes(newEj)) { // Evitar duplicados
+                    masterExercises.push(newEj);
+                    input.value = "";
+                    saveMasterExercises();
+                    loadMasterExercises();
+                } else {
+                    alert("Ese ejercicio ya existe en el listado maestro.");
+                }
             }
         }
 
         function updateMasterExercise(index, newText) {
             newText = newText.trim();
-            if (newText && masterExercises[index] !== undefined && !masterExercises.includes(newText)) {
-                masterExercises[index] = newText;
-                saveMasterExercises();
-                loadMasterExercises(); // Recarga para ordenar y evitar duplicados visuales
-            } else if (masterExercises.includes(newText) && masterExercises[index] !== newText) {
-                alert("Ya existe un ejercicio con ese nombre.");
-                loadMasterExercises(); // Recarga para volver al valor original
-            } else if (!newText) {
-                alert("El nombre del ejercicio no puede estar vacío. Borra la entrada si no la quieres.");
-                loadMasterExercises(); // Recarga para volver al valor original
+            if (masterExercises[index] !== undefined) {
+                if (newText) {
+                    // Check if the new name already exists, excluding the current item
+                    const isDuplicate = masterExercises.some((ej, i) => i !== index && ej === newText);
+                    if (isDuplicate) {
+                        alert("Ya existe un ejercicio con ese nombre.");
+                        loadMasterExercises(); // Recarga para volver al valor original
+                    } else {
+                        masterExercises[index] = newText;
+                        saveMasterExercises();
+                        loadMasterExercises(); // Recarga para ordenar y refrescar la vista
+                    }
+                } else {
+                    alert("El nombre del ejercicio no puede estar vacío. Borra la entrada si no la quieres.");
+                    loadMasterExercises(); // Recarga para volver al valor original
+                }
             }
         }
 
@@ -502,21 +525,11 @@
             alert(`Cambios para ${planEntrenamiento[dayId].name} guardados.`);
         }
 
-        // Esta función es para asegurar que index.html tenga acceso a los ejercicios de los 3 días por defecto
-        function updateIndexHtmlExercises() {
-            const defaultDays = { // Mapping for d1, d2, d3 in index.html
-                d1: Object.values(planEntrenamiento).find(day => day.name.toLowerCase().includes("día 1") || day.name.toLowerCase().includes("dia 1")),
-                d2: Object.values(planEntrenamiento).find(day => day.name.toLowerCase().includes("día 2") || day.name.toLowerCase().includes("dia 2")),
-                d3: Object.values(planEntrenamiento).find(day => day.name.toLowerCase().includes("día 3") || day.name.toLowerCase().includes("dia 3"))
-            };
-
-            const exercisesForIndex = {};
-            if (defaultDays.d1) exercisesForIndex.d1 = defaultDays.d1.ejercicios;
-            if (defaultDays.d2) exercisesForIndex.d2 = defaultDays.d2.ejercicios;
-            if (defaultDays.d3) exercisesForIndex.d3 = defaultDays.d3.ejercicios;
-            
-            localStorage.setItem("ejerciciosDias", JSON.stringify(exercisesForIndex));
+        function savePlan() {
+            localStorage.setItem("planEntrenamiento", JSON.stringify(planEntrenamiento));
+            // Asegúrate de que index.html se actualice, se hará al recargar
         }
+
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', () => {
