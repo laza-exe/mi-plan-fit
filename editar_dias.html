@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Ejercicios</title>
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #f8f9fa;
+            --card: #ffffff;
+            --primary: #7ba4c4;
+            --accent: #aac6b8;
+            --text: #333333;
+        }
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            padding: 1rem;
+        }
+        .section {
+            background: var(--card);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+        }
+        h1, h2 {
+            color: var(--primary);
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 0.6rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.6rem;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            background: #f1f1f1;
+            padding: 0.8rem;
+            margin-bottom: 0.5rem;
+            border-radius: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .add-btn, .save-btn, .back-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 0.6rem;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 1rem;
+            width: 100%;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 0.4rem 0.8rem;
+            border-radius: 0.4rem;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .back-btn {
+            background: var(--accent);
+            color: var(--text);
+            margin-top: 1.5rem;
+            border: 1px solid var(--primary);
+        }
+        .back-btn:hover {
+            background-color: #9ab6a8;
+        }
+        .add-btn:hover, .save-btn:hover {
+            background-color: #6a92b0;
+        }
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 1rem;
+        }
+        .tab-buttons button {
+            flex: 1;
+            padding: 0.8rem;
+            border: 1px solid #ccc;
+            background: #eee;
+            cursor: pointer;
+            font-weight: bold;
+            border-radius: 0; /* Reset border-radius for tabs */
+            margin-bottom: 0; /* Reset margin-bottom for tabs */
+        }
+        .tab-buttons button:first-child {
+            border-top-left-radius: 0.6rem;
+            border-bottom-left-radius: 0.6rem;
+        }
+        .tab-buttons button:last-child {
+            border-top-right-radius: 0.6rem;
+            border-bottom-right-radius: 0.6rem;
+        }
+        .tab-buttons button.active {
+            background: var(--primary);
+            color: white;
+        }
+        .tab-content {
+            border: 1px solid #ccc;
+            border-top: none;
+            padding: 1rem;
+            border-bottom-left-radius: 0.6rem;
+            border-bottom-right-radius: 0.6rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>✏️ Editar Ejercicios Diarios</h1>
+
+    <div class="section">
+        <div class="tab-buttons">
+            <button onclick="showTab('d1')" id="tabD1">Día 1</button>
+            <button onclick="showTab('d2')" id="tabD2">Día 2</button>
+            <button onclick="showTab('d3')" id="tabD3">Día 3</button>
+        </div>
+
+        <div id="contentD1" class="tab-content">
+            <h2>Ejercicios Día 1</h2>
+            <ul id="listaEjerciciosD1"></ul>
+            <input type="text" id="nuevoEjercicioD1" placeholder="Nuevo ejercicio para Día 1">
+            <button onclick="addEjercicio('d1')" class="add-btn">➕ Añadir Ejercicio</button>
+            <button onclick="saveEjercicios('d1')" class="save-btn">💾 Guardar Cambios Día 1</button>
+        </div>
+
+        <div id="contentD2" class="tab-content" style="display:none;">
+            <h2>Ejercicios Día 2</h2>
+            <ul id="listaEjerciciosD2"></ul>
+            <input type="text" id="nuevoEjercicioD2" placeholder="Nuevo ejercicio para Día 2">
+            <button onclick="addEjercicio('d2')" class="add-btn">➕ Añadir Ejercicio</button>
+            <button onclick="saveEjercicios('d2')" class="save-btn">💾 Guardar Cambios Día 2</button>
+        </div>
+
+        <div id="contentD3" class="tab-content" style="display:none;">
+            <h2>Ejercicios Día 3</h2>
+            <ul id="listaEjerciciosD3"></ul>
+            <input type="text" id="nuevoEjercicioD3" placeholder="Nuevo ejercicio para Día 3">
+            <button onclick="addEjercicio('d3')" class="add-btn">➕ Añadir Ejercicio</button>
+            <button onclick="saveEjercicios('d3')" class="save-btn">💾 Guardar Cambios Día 3</button>
+        </div>
+    </div>
+
+    <button onclick="window.location.href='index.html'" class="back-btn">⬅️ Volver a Mi Plan Fit</button>
+
+    <script>
+        let ejerciciosDias = JSON.parse(localStorage.getItem("ejerciciosDias") || "{}");
+
+        function loadEjercicios(day) {
+            const ul = document.getElementById(`listaEjercicios${day.toUpperCase()}`);
+            ul.innerHTML = "";
+            const currentEjercicios = ejerciciosDias[day] || [];
+            currentEjercicios.forEach((ej, index) => {
+                const li = document.createElement("li");
+                li.innerHTML = `
+                    <span contenteditable="true" onblur="updateEjercicio('${day}', ${index}, this.innerText)">${ej}</span>
+                    <button onclick="deleteEjercicio('${day}', ${index})" class="delete-btn">🗑</button>
+                `;
+                ul.appendChild(li);
+            });
+        }
+
+        function addEjercicio(day) {
+            const input = document.getElementById(`nuevoEjercicio${day.toUpperCase()}`);
+            const nuevoEj = input.value.trim();
+            if (nuevoEj) {
+                if (!ejerciciosDias[day]) {
+                    ejerciciosDias[day] = [];
+                }
+                ejerciciosDias[day].push(nuevoEj);
+                input.value = "";
+                loadEjercicios(day);
+            }
+        }
+
+        function updateEjercicio(day, index, newText) {
+            if (ejerciciosDias[day] && ejerciciosDias[day][index] !== undefined) {
+                ejerciciosDias[day][index] = newText.trim();
+                saveEjercicios(day); // Guarda automáticamente al editar
+            }
+        }
+
+        function deleteEjercicio(day, index) {
+            if (confirm(`¿Estás seguro de que quieres borrar "${ejerciciosDias[day][index]}"?`)) {
+                ejerciciosDias[day].splice(index, 1);
+                loadEjercicios(day);
+                saveEjercicios(day); // Guarda después de borrar
+            }
+        }
+
+        function saveEjercicios(day) {
+            localStorage.setItem("ejerciciosDias", JSON.stringify(ejerciciosDias));
+            alert(`Cambios del Día ${day.toUpperCase()} guardados.`);
+        }
+
+        let activeTab = 'd1';
+
+        function showTab(tabId) {
+            document.getElementById(`content${activeTab.toUpperCase()}`).style.display = 'none';
+            document.getElementById(`tab${activeTab.toUpperCase()}`).classList.remove('active');
+
+            activeTab = tabId;
+
+            document.getElementById(`content${activeTab.toUpperCase()}`).style.display = 'block';
+            document.getElementById(`tab${activeTab.toUpperCase()}`).classList.add('active');
+            loadEjercicios(activeTab);
+        }
+
+        // Inicializar la app
+        document.addEventListener('DOMContentLoaded', () => {
+            showTab(activeTab); // Muestra el Día 1 por defecto al cargar
+        });
+    </script>
+</body>
+</html>

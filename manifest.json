@@ -1,0 +1,21 @@
+{
+  "name": "Mi Plan Fit",
+  "short_name": "Plan Fit",
+  "description": "Tu app personal de seguimiento de entrenamientos y peso.",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#f8f9fa",
+  "theme_color": "#7ba4c4",
+  "icons": [
+    {
+      "src": "icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
