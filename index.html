@@ -322,6 +322,24 @@
         text-align: center;
     }
 
+    #bmiDisplay {
+        margin-top: 15px;
+        font-size: 1.1em;
+        font-weight: 600;
+        text-align: center;
+        padding: 10px;
+        border-radius: 8px;
+        background-color: var(--bg);
+        border: 1px solid var(--border);
+    }
+
+    #bmiDisplay.normal {
+        color: var(--success);
+    }
+    #bmiDisplay.underweight, #bmiDisplay.overweight, #bmiDisplay.obese {
+        color: var(--danger);
+    }
+
     @media (max-width: 600px) {
       body {
         padding: 10px;
@@ -401,12 +419,18 @@
     </div>
 
     <div class="section">
-      <h2>Seguimiento de Peso</h2>
+      <h2>Seguimiento de Peso e IMC</h2>
+      <div class="form-group">
+        <label for="userHeight">Altura (metros):</label>
+        <input type="number" id="userHeight" placeholder="Ej. 1.75" step="0.01" min="0.1" />
+      </div>
       <div class="form-group">
         <label for="currentWeight">Peso actual (kg):</label>
         <input type="number" id="currentWeight" placeholder="Ej. 75.5" step="0.1" />
       </div>
       <button id="addWeightBtn">Registrar Peso</button>
+      <div id="bmiDisplay">
+        </div>
       <div class="chart-container">
         <canvas id="weightChart"></canvas>
       </div>
@@ -450,6 +474,7 @@
     let currentDay = 0; // Índice del día actual (0 para Lunes, 1 para Martes, etc.)
     let ejerciciosSesiones = []; // Historial de ejercicios completados
     let pesos = []; // Historial de pesos registrados
+    let userHeight = null; // Altura del usuario en metros
     let weightChartInstance = null; // Instancia del gráfico de peso
     let exerciseChartInstance = null; // Instancia del gráfico de ejercicio
 
@@ -465,9 +490,11 @@
     const exerciseRepsInput = document.getElementById('exerciseReps');
     const exerciseWeightInput = document.getElementById('exerciseWeight');
     const exerciseNotesInput = document.getElementById('exerciseNotes');
+    const userHeightInput = document.getElementById('userHeight'); // Nuevo
     const currentWeightInput = document.getElementById('currentWeight');
     const addWeightBtn = document.getElementById('addWeightBtn');
     const weightHistoryList = document.getElementById('weightHistoryList');
+    const bmiDisplay = document.getElementById('bmiDisplay'); // Nuevo
     const exerciseHistoryDropdown = document.getElementById('exerciseHistoryDropdown');
     const exerciseHistoryDisplay = document.getElementById('exerciseHistoryDisplay');
     const dropdownBtn = document.getElementById('dropdownBtn');
@@ -501,11 +528,19 @@
         localStorage.setItem("peso_historial", JSON.stringify(pesos));
     }
 
+    function saveUserHeight() { // Nuevo
+        localStorage.setItem("user_height", JSON.stringify(userHeight));
+    }
+
     // Cargar datos de localStorage
     function loadData() {
         planEntrenamientoIndex = JSON.parse(localStorage.getItem("planEntrenamiento")) || {};
         ejerciciosSesiones = JSON.parse(localStorage.getItem("ejercicios_sesiones")) || [];
         pesos = JSON.parse(localStorage.getItem("peso_historial")) || [];
+        userHeight = JSON.parse(localStorage.getItem("user_height")) || null; // Nuevo
+        if (userHeight) {
+            userHeightInput.value = userHeight; // Cargar la altura en el input
+        }
     }
 
     // Alternar modo oscuro
@@ -587,12 +622,14 @@
     // --- Event Listeners para Navegación de Días ---
     prevDayBtn.addEventListener('click', () => {
         currentDay = (currentDay - 1 + 7) % 7; // Ir al día anterior, ciclando
+        localStorage.setItem("currentDayIndex", currentDay); // Guardar el día actual
         cargarEjerciciosDias();
         resetChecksForCurrentDay(); // Reiniciar checks al cambiar de día
     });
 
     nextDayBtn.addEventListener('click', () => {
         currentDay = (currentDay + 1) % 7; // Ir al día siguiente, ciclando
+        localStorage.setItem("currentDayIndex", currentDay); // Guardar el día actual
         cargarEjerciciosDias();
         resetChecksForCurrentDay(); // Reiniciar checks al cambiar de día
     });
@@ -707,7 +744,56 @@
         }
     });
 
-    // --- Funciones para el Seguimiento de Peso ---
+    // --- Funciones para el Seguimiento de Peso e IMC ---
+
+    // Calcular IMC
+    function calculateBMI(weight, height) {
+        if (weight > 0 && height > 0) {
+            return (weight / (height * height)).toFixed(2);
+        }
+        return null;
+    }
+
+    // Interpretar IMC y mostrarlo
+    function displayBMI() {
+        const latestWeight = pesos.length > 0 ? pesos[pesos.length - 1].weight : null;
+        const height = userHeight;
+
+        bmiDisplay.className = ''; // Limpiar clases anteriores
+
+        if (latestWeight && height) {
+            const bmi = calculateBMI(latestWeight, height);
+            let interpretation = '';
+            let className = '';
+
+            if (bmi < 18.5) {
+                interpretation = 'Bajo peso';
+                className = 'underweight';
+            } else if (bmi >= 18.5 && bmi < 25) {
+                interpretation = 'Peso normal';
+                className = 'normal';
+            } else if (bmi >= 25 && bmi < 30) {
+                interpretation = 'Sobrepeso';
+                className = 'overweight';
+            } else {
+                interpretation = 'Obesidad';
+                className = 'obese';
+            }
+            bmiDisplay.innerHTML = `Tu IMC actual es: <strong>${bmi}</strong> (${interpretation}).`;
+            bmiDisplay.classList.add(className);
+
+             // Mensaje cualitativo sin dar asesoramiento médico o de peso
+             if (className === 'normal') {
+                bmiDisplay.innerHTML += '<br>Tu peso se encuentra en un rango saludable según el IMC.';
+            } else {
+                bmiDisplay.innerHTML += '<br>Considera que tu peso se encuentra fuera del rango saludable según el IMC.';
+            }
+
+        } else {
+            bmiDisplay.textContent = 'Introduce tu altura y registra tu peso para calcular el IMC.';
+        }
+    }
+
 
     // Mostrar el historial de peso en la lista
     function displayPesoHistory() {
@@ -721,18 +807,45 @@
         });
     }
 
+    // Evento al cambiar la altura
+    userHeightInput.addEventListener('change', () => {
+        const height = parseFloat(userHeightInput.value);
+        if (isNaN(height) || height <= 0) {
+            alert("Por favor, introduce una altura válida (en metros, mayor que 0).");
+            userHeight = null; // Resetear altura si es inválida
+            userHeightInput.value = '';
+        } else {
+            userHeight = height;
+        }
+        saveUserHeight();
+        displayBMI(); // Actualizar IMC al cambiar la altura
+    });
+
+
     // Añadir nuevo peso
     addWeightBtn.addEventListener('click', () => {
         const weight = parseFloat(currentWeightInput.value);
+        const height = parseFloat(userHeightInput.value); // Obtener altura en el momento de registrar el peso
+
         if (isNaN(weight) || weight <= 0) {
             alert("Por favor, introduce un peso válido (mayor que 0).");
             return;
         }
+        if (isNaN(height) || height <= 0) {
+            alert("Por favor, introduce tu altura en metros para registrar el peso y calcular el IMC.");
+            return;
+        }
+
+        // Asegurarse de que userHeight esté actualizado antes de guardar el peso
+        userHeight = height;
+        saveUserHeight();
+
         const date = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
         pesos.push({ date, weight });
         savePesos();
         displayPesoHistory();
         updateWeightChart(); // Actualizar gráfico al añadir nuevo peso
+        displayBMI(); // Actualizar IMC al añadir nuevo peso
         currentWeightInput.value = ''; // Limpiar campo
     });
 
@@ -963,6 +1076,10 @@
             planEntrenamientoIndex['day-1'] = { name: "Día 1 - Full Body Fuerza", ejercicios: ["Peso muerto rumano", "Dominadas asistidas", "Press inclinado", "Plancha", "Bird-dogs"] };
             planEntrenamientoIndex['day-2'] = { name: "Día 2 - Hipertrofia + Core", ejercicios: ["Sentadilla goblet", "Remo con barra", "Z-Press", "Plancha reach", "Hollow hold"] };
             planEntrenamientoIndex['day-3'] = { name: "Día 3 - Cardio + Core", ejercicios: ["Caminata inclinada", "2 abdominales a elección", "Movilidad 10 min"] };
+            planEntrenamientoIndex['day-4'] = { name: "Día 4 - Descanso", ejercicios: [] };
+            planEntrenamientoIndex['day-5'] = { name: "Día 5 - Tren Superior", ejercicios: ["Press de hombros", "Remo con mancuernas", "Flexiones"] };
+            planEntrenamientoIndex['day-6'] = { name: "Día 6 - Tren Inferior", ejercicios: ["Sentadilla", "Peso muerto", "Zancadas"] };
+            planEntrenamientoIndex['day-7'] = { name: "Día 7 - Actividad Ligera", ejercicios: ["Yoga", "Caminata"] };
             savePlan(); // Guardar los valores por defecto
         }
 
@@ -979,6 +1096,7 @@
         
         displayPesoHistory(); // Cargar y mostrar el historial de peso
         updateWeightChart(); // Cargar gráfico de peso al inicio
+        displayBMI(); // Mostrar IMC al inicio
 
         populateExerciseChartDropdown(); // Llenar el select de ejercicios para el gráfico
         populateExerciseHistoryDropdown(); // Llenar el select de historial de ejercicios
@@ -990,14 +1108,6 @@
             if (event.target.type === 'checkbox') {
                 guardarChecks();
             }
-        });
-
-        // Asegurarse de que al cambiar de día, el `currentDayIndex` se guarde
-        prevDayBtn.addEventListener('click', () => {
-            localStorage.setItem("currentDayIndex", currentDay);
-        });
-        nextDayBtn.addEventListener('click', () => {
-            localStorage.setItem("currentDayIndex", currentDay);
         });
     });
 
