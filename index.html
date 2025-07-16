@@ -23,1299 +23,996 @@
       --danger: #dc3545;
       --border: #e0e0e0;
       --input-bg: #ffffff;
-      --button-secondary-text: var(--text);
-      --header-bg: #f0f0f0; /* Color de fondo para el encabezado */
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      --font-family: 'Inter', sans-serif;
     }
-    
-    /* Dark Mode */
+
     body.dark-mode {
       --bg: #1a1a2e;
       --card: #20203a;
-      --primary: #8aafff; /* Un azul más brillante para contraste */
-      --accent: #5e8b7e; /* Un verde-azulado para contraste */
+      --primary: #8aafff;
+      --accent: #5e8b7e;
       --text: #e0e0e0;
       --success: #4CAF50;
       --danger: #f44336;
       --border: #44445c;
       --input-bg: #2a2a40;
-      --button-secondary-text: #e0e0e0;
-      --header-bg: #2a2a40; /* Color de fondo para el encabezado en modo oscuro */
+      --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     }
 
     body {
-      margin: 0;
-      font-family: 'Inter', sans-serif;
-      background: var(--bg);
+      font-family: var(--font-family);
+      background-color: var(--bg);
       color: var(--text);
-      padding: 1rem;
-      padding-top: 70px; /* Ajuste para el menú fijo */
+      margin: 0;
+      padding: 20px;
+      line-height: 1.6;
       transition: background-color 0.3s, color 0.3s;
     }
-    h1, h2, h3 {
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: var(--card);
+      border-radius: 12px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    h1, h2 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 10px;
+      margin-top: 30px;
+    }
+
+    .section {
+      margin-bottom: 25px;
+      padding: 15px;
+      background-color: var(--bg);
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 600;
       color: var(--primary);
     }
-    .app-title { /* Nuevo estilo para el título principal */
-      text-align: center;
-      margin-top: 0; /* Asegurarse de que no haya margen superior si el body ya tiene padding */
-      margin-bottom: 1.5rem;
-      font-size: 2rem;
-    }
-    .section {
-      background: var(--card);
-      border-radius: 1rem;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-      transition: background-color 0.3s, box-shadow 0.3s;
-    }
-    label {
-      font-weight: 600;
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-    input, textarea, button, select {
-      width: 100%;
-      padding: 0.6rem;
-      margin-bottom: 1rem;
-      border-radius: 0.6rem;
+
+    input[type="number"],
+    input[type="text"],
+    input[type="date"],
+    select,
+    textarea {
+      width: calc(100% - 20px);
+      padding: 12px 10px;
+      margin-bottom: 10px;
       border: 1px solid var(--border);
-      font-size: 1rem;
-      box-sizing: border-box;
+      border-radius: 8px;
       background-color: var(--input-bg);
       color: var(--text);
-      transition: border-color 0.3s, background-color 0.3s, color 0.3s;
-    }
-    button {
-      background: var(--primary);
-      color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background-color 0.3s ease, color 0.3s;
-    }
-    button:hover {
-      background-color: #6a92b0; /* Un tono más oscuro del primary */
-      /* Adaptar para dark mode */
-      filter: brightness(110%);
-    }
-    .button-secondary {
-      background: var(--accent);
-      color: var(--button-secondary-text);
-      border: 1px solid var(--primary);
-    }
-    .button-secondary:hover {
-      background-color: #9ab6a8;
-      filter: brightness(110%);
-    }
-    .button-danger {
-      background: var(--danger);
-      color: white;
-    }
-    .button-danger:hover {
-      background-color: #c82333;
-      filter: brightness(110%);
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-bottom: 1rem;
-    }
-    th, td {
-      padding: 0.6rem;
-      border-bottom: 1px solid var(--border);
-      text-align: center;
+      font-family: var(--font-family);
+      font-size: 1rem;
       transition: border-color 0.3s;
     }
-    th {
-      background-color: var(--accent);
-      color: var(--button-secondary-text);
-    }
-    .small-btn {
-      padding: 0.4rem;
-      font-size: 0.85rem;
-      width: auto;
-      margin: 0 0.25rem;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 30px;
-    }
-    ul {
-      padding-left: 1.2rem;
-      list-style: none;
-    }
-    ul li {
-      margin-bottom: 0.3rem;
-    }
-    .message {
-        margin-top: -0.5rem;
-        margin-bottom: 1rem;
-        padding: 0.6rem;
-        border-radius: 0.6rem;
-        font-size: 0.9rem;
-        text-align: center;
-    }
-    .message.success {
-        background-color: #d4edda;
-        color: var(--success);
-        border: 1px solid var(--success);
-    }
-    .message.error {
-        background-color: #f8d7da;
-        color: var(--danger);
-        border: 1px solid var(--danger);
-    }
-    body.dark-mode .message.success { background-color: #38603c; color: #9be6a0; }
-    body.dark-mode .message.error { background-color: #8c3f41; color: #f8d7da; }
 
-
-    .peso-history-table th, .peso-history-table td {
-        padding: 0.5rem;
-        font-size: 0.9rem;
-    }
-    .peso-history-table .date-header {
-        background-color: var(--primary);
-        color: white;
-        font-weight: bold;
-        text-align: left;
-    }
-    .add-from-calendar {
-        margin-top: 1rem;
-        padding-top: 1rem;
-        border-top: 1px solid var(--border);
-    }
-    .exercise-history-table {
-        margin-top: 1rem;
-    }
-    .exercise-history-table th, .exercise-history-table td {
-        font-size: 0.9rem;
-        padding: 0.4rem;
+    input[type="number"]:focus,
+    input[type="text"]:focus,
+    input[type="date"]:focus,
+    select:focus,
+    textarea:focus {
+      border-color: var(--primary);
+      outline: none;
     }
 
-    /* Estilos para el temporizador */
-    .timer-container {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        margin-bottom: 1rem;
-        flex-wrap: wrap;
-    }
-    .timer-container input {
-        width: 80px; /* Ancho para el input de tiempo */
-        margin-bottom: 0;
-    }
-    .timer-container button {
-        width: auto;
-        padding: 0.5rem 1rem;
-        margin-bottom: 0;
-    }
-    #countdownDisplay {
-        font-size: 1.2rem;
-        font-weight: bold;
-        color: var(--primary);
-        min-width: 80px;
-        text-align: center;
-    }
-
-    /* Estilos para el toggle de modo oscuro */
-    .switch {
-      position: relative;
-      display: inline-block;
-      width: 40px;
-      height: 20px;
-    }
-    .switch input {
-      opacity: 0;
-      width: 0;
-      height: 0;
-    }
-    .slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #ccc;
-      -webkit-transition: .4s;
-      transition: .4s;
-      border-radius: 20px;
-    }
-    .slider:before {
-      position: absolute;
-      content: "";
-      height: 16px;
-      width: 16px;
-      left: 2px;
-      bottom: 2px;
-      background-color: white;
-      -webkit-transition: .4s;
-      transition: .4s;
-      border-radius: 50%;
-    }
-    input:checked + .slider {
+    button {
       background-color: var(--primary);
-    }
-    input:focus + .slider {
-      box-shadow: 0 0 1px var(--primary);
-    }
-    input:checked + .slider:before {
-      -webkit-transform: translateX(20px);
-      -ms-transform: translateX(20px);
-      transform: translateX(20px);
-    }
-    .dark-mode-label {
-        margin-right: 0.5rem;
-        display: flex;
-        align-items: center;
-        font-weight: normal;
-        font-size: 0.9rem;
-    }
-    /* Responsive table container */
-    .table-container {
-        overflow-x: auto; /* Allows horizontal scrolling for the table */
-        margin-bottom: 1rem;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background-color 0.3s ease;
+      display: inline-block;
+      width: auto;
+      margin-right: 10px;
+      margin-bottom: 10px;
     }
 
-    /* Fixed Header/Menu Styles */
-    .fixed-header {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        background-color: var(--header-bg);
-        color: var(--text);
-        padding: 0.5rem 1rem;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        display: flex;
-        justify-content: flex-end; /* Align to right for menu items */
-        align-items: center;
-        z-index: 1000;
-        box-sizing: border-box;
-        transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
-    }
-    .menu-right {
-        display: flex;
-        align-items: center;
-        gap: 1rem;
+    button:hover {
+      background-color: #6a95b5;
     }
 
-    /* Dropdown for data management */
+    button.danger {
+      background-color: var(--danger);
+    }
+
+    button.danger:hover {
+      background-color: #c82333;
+    }
+
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+      justify-content: center;
+    }
+
+    .chart-container {
+      position: relative;
+      width: 100%;
+      height: 300px;
+      margin-top: 20px;
+    }
+
+    .chart-controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .chart-controls label {
+      margin-bottom: 0;
+      white-space: nowrap;
+    }
+
+    .exercise-list, .weight-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .exercise-list li, .weight-list li {
+      background-color: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+
+    .exercise-list li .exercise-info {
+      flex-grow: 1;
+    }
+
+    .exercise-list li .exercise-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .exercise-list li span {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    .current-day-exercises {
+        margin-top: 15px;
+        font-size: 1.1em;
+    }
+
+    .current-day-exercises p {
+        background-color: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 10px;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+    }
+
+    .current-day-exercises p input[type="checkbox"] {
+        margin-right: 10px;
+        transform: scale(1.2);
+    }
+
+    .current-day-exercises h3 {
+        color: var(--accent);
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+
     .dropdown {
         position: relative;
         display: inline-block;
     }
+
     .dropdown-content {
-        display: none; /* Controlado por JS ahora */
+        display: none;
         position: absolute;
         background-color: var(--card);
-        min-width: 220px; /* Un poco más ancho para las opciones */
-        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        min-width: 160px;
+        box-shadow: var(--shadow);
         z-index: 1;
-        right: 0; /* Align to the right */
-        border-radius: 0.6rem;
+        border-radius: 8px;
         overflow: hidden;
-        transition: background-color 0.3s;
+        right: 0; /* Align to the right */
     }
+
     .dropdown-content a {
         color: var(--text);
-        padding: 10px 16px;
+        padding: 12px 16px;
         text-decoration: none;
         display: block;
-        font-size: 0.95rem;
-        transition: background-color 0.2s, color 0.2s;
     }
+
     .dropdown-content a:hover {
         background-color: var(--border);
     }
-    /* Eliminado el :hover para .dropdown-content, se controla por JS */
-    .dropbtn {
-        background-color: var(--primary);
-        color: var(--text); /* Cambia con el modo oscuro */
-        padding: 10px 15px;
-        font-size: 1.8rem; /* Hacer el icono más grande */
+
+    .menu-icon {
+        background: none;
         border: none;
+        font-size: 1.5rem;
         cursor: pointer;
-        border-radius: 0.6rem;
-        font-weight: bold; /* Para que el símbolo "☰" sea más grueso */
-        line-height: 1; /* Asegurar que el tamaño del texto no añada espacio extra */
-    }
-    .dropbtn:hover {
-        background-color: #6a92b0;
-    }
-    /* Specific styling for dangerous actions in dropdown */
-    .dropdown-content .danger-option {
-        color: var(--danger);
-    }
-    .dropdown-content .danger-option:hover {
-        background-color: rgba(var(--danger), 0.1); /* Ligero fondo rojo al pasar el ratón */
+        color: var(--primary);
+        padding: 5px 10px;
+        border-radius: 5px;
+        transition: background-color 0.3s;
     }
 
+    .menu-icon:hover {
+        background-color: var(--border);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding: 10px 0;
+      border-bottom: 2px solid var(--primary);
+    }
+
+    header h1 {
+      margin: 0;
+      flex-grow: 1;
+      text-align: center;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #darkModeToggle {
+      background-color: var(--accent);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      margin-right: 10px;
+    }
+
+    #cameraInput {
+        display: none;
+    }
+
+    #photoDisplay {
+        max-width: 100%;
+        height: auto;
+        border-radius: 8px;
+        margin-top: 15px;
+        display: block; /* Ocultar si no hay imagen */
+        margin-left: auto;
+        margin-right: auto;
+        box-shadow: var(--shadow);
+    }
+
+    .photo-section {
+        text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      body {
+        padding: 10px;
+      }
+      .container {
+        padding: 15px;
+      }
+      button {
+        width: 100%;
+        margin-right: 0;
+      }
+      .button-group {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .header-actions {
+        flex-direction: column;
+        align-items: flex-end;
+      }
+      header h1 {
+        text-align: left;
+      }
+    }
   </style>
 </head>
 <body>
-  <div class="fixed-header">
-    <div class="menu-right">
-      <label class="dark-mode-label" for="darkModeToggle">Modo Oscuro</label>
-      <label class="switch">
-        <input type="checkbox" id="darkModeToggle">
-        <span class="slider round"></span>
-      </label>
-
-      <div class="dropdown">
-        <button class="dropbtn" id="dropdownBtn">☰</button> <div class="dropdown-content" id="dropdownContent"> <a href="#" onclick="confirmClearPeso(); hideDropdown(this);">🗑️ Borrar Historial Peso</a>
-            <a href="#" onclick="confirmClearCurrentEjercicios(); hideDropdown(this);">🗑️ Borrar Ejercicios Tabla Actual</a>
-            <a href="#" onclick="confirmClearAllExerciseHistory(); hideDropdown(this);">🗑️ Borrar Todo Historial Ejercicios</a>
-            <hr style="border-color: var(--border);">
-            <a href="#" onclick="exportData(); hideDropdown(this);">⬆️ Exportar Datos</a>
-            <a href="#" onclick="document.getElementById('importFileInput').click(); hideDropdown(this);">⬇️ Importar Datos</a>
+  <div class="container">
+    <header>
+      <h1>Mi Plan Fit</h1>
+      <div class="header-actions">
+        <button id="darkModeToggle">Modo Oscuro</button>
+        <div class="dropdown">
+          <button class="menu-icon" id="dropdownBtn">☰</button>
+          <div class="dropdown-content" id="myDropdown">
+            <a href="#" id="editPlanBtn">Editar Plan Semanal</a>
+            <a href="#" id="resetAppBtn">Resetear App</a>
+          </div>
         </div>
       </div>
+    </header>
+
+    <div class="section">
+      <h2>Plan de Entrenamiento Diario</h2>
+      <div class="button-group">
+        <button id="prevDayBtn">Día Anterior</button>
+        <button id="nextDayBtn">Día Siguiente</button>
+      </div>
+      <p>Día actual: <span id="currentDayDisplay">Cargando...</span></p>
+      <div id="currentDayExercises" class="current-day-exercises">
+        </div>
+      <div class="form-group">
+        <label for="exerciseName">Nombre del Ejercicio:</label>
+        <input type="text" id="exerciseName" placeholder="Ej. Sentadilla" />
+        <label for="exerciseSets">Series:</label>
+        <input type="number" id="exerciseSets" placeholder="Ej. 3" min="1"/>
+        <label for="exerciseReps">Repeticiones:</label>
+        <input type="number" id="exerciseReps" placeholder="Ej. 10" min="1"/>
+        <label for="exerciseWeight">Peso (kg):</label>
+        <input type="number" id="exerciseWeight" placeholder="Ej. 50" step="0.1"/>
+        <label for="exerciseNotes">Notas:</label>
+        <textarea id="exerciseNotes" placeholder="Observaciones (ej. 'RPE 8', 'fácil', 'fallo')"></textarea>
+      </div>
+      <button id="addExerciseBtn">Añadir Ejercicio a Sesión</button>
+      <button id="finishDayBtn">Finalizar Día de Entrenamiento</button>
     </div>
-  </div>
 
-  <h1 class="app-title">Mi Plan Fit 📱</h1>
-
-  <input type="file" id="importFileInput" style="display: none;" accept=".json">
-
-
-  <div class="section">
-    <h2>✅ Calendario Semanal</h2>
-    <p><b>Hoy es:</b> <span id="hoyFecha"></span></p>
-    <label><input type="checkbox" onchange="guardarCheck('d1')" id="d1"> Día 1 - Full Body Fuerza</label>
-    <ul id="ejD1"></ul>
-    <label><input type="checkbox" onchange="guardarCheck('d2')" id="d2"> Día 2 - Hipertrofia + Core</label>
-    <ul id="ejD2"></ul>
-    <label><input type="checkbox" onchange="guardarCheck('d3')" id="d3"> Día 3 - Cardio + Core</label>
-    <ul id="ejD3"></ul>
-    <p><b>Sesiones completadas esta semana:</b> <span id="semanaCompletadas">0</span>/3</p>
-    <button onclick="window.location.href='editar_dias.html'" class="button-secondary">✏️ Editar Ejercicios Diarios</button>
-  </div>
-
-  <div class="section">
-    <h2>📉 Seguimiento de Peso</h2>
-    <input type="number" id="peso" placeholder="Tu peso (kg)" step="0.1">
-    <button onclick="savePeso()">Guardar Peso</button>
-    <div id="pesoMessage" class="message" style="display: none;"></div>
-    
-    <h3>Historial de Peso</h3>
-    <table id="pesoHistoryTable" class="peso-history-table">
-      <thead>
-        <tr><th>Fecha</th><th>Peso (kg)</th><th>Acciones</th></tr>
-      </thead>
-      <tbody>
-        </tbody>
-    </table>
-    
-  </div>
-
-  <div class="section">
-    <h2>📊 Gráficos de Progreso</h2>
-    <h3>Evolución del Peso</h3>
-    <canvas id="weightChart"></canvas>
-
-    <h3 style="margin-top: 1.5rem;">Progreso de Ejercicio Específico</h3>
-    <select id="exerciseChartSelect" onchange="updateExerciseChart()">
-        <option value="">Selecciona un ejercicio...</option>
+    <div class="section">
+      <h2>Historial de Sesiones</h2>
+      <div class="form-group">
+        <label for="exerciseHistoryDropdown">Seleccionar Ejercicio:</label>
+        <select id="exerciseHistoryDropdown">
+          <option value="">Selecciona un ejercicio para ver su historial</option>
         </select>
-    <canvas id="exerciseChart" style="margin-top: 1rem;"></canvas>
-  </div>
-
-  <div class="section">
-    <h2>📸 Foto de Progreso</h2>
-    <input type="file" accept="image/*" id="fotoProgresoInput" onchange="handleFileSelect(event)">
-    <p style="font-size: 0.9rem;">* Solo local, no se sube a ningún servidor. La última foto subida se guardará en tu navegador.</p>
-    <div id="fotoDisplay" style="text-align: center; margin-top: 1rem;">
-        <img id="lastPhoto" style="max-width: 100%; height: auto; border-radius: 0.6rem; display: none;" alt="Última foto de progreso">
-    </div>
-  </div>
-
-  <div class="section">
-    <h2>🏋️ Carga de Ejercicios</h2>
-    <p>Rellena esta tabla con tu sesión de hoy. Al guardar, se añadirá al historial.</p>
-    <div class="table-container"> <table id="tablaEjercicios">
-          <thead>
-            <tr><th>Ejercicio</th><th>Series</th><th>Peso (kg)</th><th>Notas</th><th>Acciones</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-    </div>
-    <button onclick="addFila()">➕ Añadir Ejercicio Manualmente</button>
-
-    <div class="add-from-calendar">
-        <label for="selectEjercicioCalendario">Añadir ejercicio del calendario:</label>
-        <select id="selectEjercicioCalendario">
-            <option value="">Selecciona un ejercicio...</option>
-            </select>
-        <button onclick="addEjercicioFromCalendar()">➕ Añadir del Calendario</button>
-    </div>
-
-    <div class="timer-container">
-        <label for="restTime">Temporizador de Descanso:</label>
-        <input type="number" id="restTime" value="60" min="5" style="width: 70px; margin-bottom: 0;"> segundos
-        <button onclick="startTimer()" id="timerStartBtn">▶️ Iniciar</button>
-        <button onclick="resetTimer()" id="timerResetBtn" class="button-danger" style="display: none;">⏹️ Reset</button>
-        <span id="countdownDisplay"></span>
-    </div>
-
-    <button onclick="guardarEjerciciosSesion()">💾 Guardar Sesión de Hoy</button>
-    <div id="ejerciciosMessage" class="message" style="display: none;"></div>
-    
-  </div>
-
-  <div class="section">
-    <h2>📚 Historial de Sesiones de Ejercicio</h2>
-    <label for="selectHistoryDate">Selecciona una fecha:</label>
-    <select id="selectHistoryDate" onchange="displaySelectedExerciseSession()"></select>
-    
-    <div id="exerciseHistoryDisplay">
+      </div>
+      <div id="exerciseHistoryDisplay">
         </div>
+    </div>
+
+    <div class="section">
+      <h2>Seguimiento de Peso</h2>
+      <div class="form-group">
+        <label for="currentWeight">Peso actual (kg):</label>
+        <input type="number" id="currentWeight" placeholder="Ej. 75.5" step="0.1" />
+      </div>
+      <button id="addWeightBtn">Registrar Peso</button>
+      <div class="chart-container">
+        <canvas id="weightChart"></canvas>
+      </div>
+      <h3>Historial de Pesos:</h3>
+      <ul id="weightHistoryList" class="weight-list">
+        </ul>
+    </div>
+
+    <div class="section">
+      <h2>Progreso en Ejercicios (Gráfico)</h2>
+      <div class="chart-controls">
+        <label for="exerciseChartSelect">Seleccionar Ejercicio:</label>
+        <select id="exerciseChartSelect">
+          <option value="">Seleccione un ejercicio</option>
+        </select>
+        <label for="exerciseChartMetric">Métrica:</label>
+        <select id="exerciseChartMetric">
+          <option value="weight">Peso</option>
+          <option value="reps">Repeticiones</option>
+          <option value="sets">Series</option>
+        </select>
+      </div>
+      <div class="chart-container">
+        <canvas id="exerciseChart"></canvas>
+      </div>
+    </div>
+
+    <div class="section photo-section">
+      <h2>Seguimiento Visual</h2>
+      <input type="file" id="cameraInput" accept="image/*" capture="environment">
+      <button onclick="document.getElementById('cameraInput').click();">Tomar Foto de Progreso</button>
+      <img id="photoDisplay" src="#" alt="Foto de Progreso" style="display: none;">
+      <button id="clearPhotoBtn" class="danger" style="display: none;">Eliminar Última Foto</button>
+    </div>
+
   </div>
 
-<script>
-  // --- Global Variables and Setup ---
-  const hoy = new Date();
-  document.getElementById("hoyFecha").innerText = hoy.toLocaleDateString("es-ES", { weekday: 'long', day: 'numeric', month: 'long' });
+  <script>
+    // --- Variables Globales ---
+    let planEntrenamientoIndex = {}; // Almacena el plan de entrenamiento semanal
+    let currentDay = 0; // Índice del día actual (0 para Lunes, 1 para Martes, etc.)
+    let ejerciciosSesiones = []; // Historial de ejercicios completados
+    let pesos = []; // Historial de pesos registrados
+    let weightChartInstance = null; // Instancia del gráfico de peso
+    let exerciseChartInstance = null; // Instancia del gráfico de ejercicio
 
-  // Reset semanal (lunes)
-  function getWeekNumber(d) {
-    d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
-    var yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
-    var weekNo = Math.ceil(( ( (d - yearStart) / 86400000) + 1)/7);
-    return d.getUTCFullYear() + '-W' + String(weekNo).padStart(2,'0');
-  }
+    // --- Selectores DOM ---
+    const currentDayDisplay = document.getElementById('currentDayDisplay');
+    const currentDayExercisesDiv = document.getElementById('currentDayExercises');
+    const addExerciseBtn = document.getElementById('addExerciseBtn');
+    const finishDayBtn = document.getElementById('finishDayBtn');
+    const prevDayBtn = document.getElementById('prevDayBtn');
+    const nextDayBtn = document.getElementById('nextDayBtn');
+    const exerciseNameInput = document.getElementById('exerciseName');
+    const exerciseSetsInput = document.getElementById('exerciseSets');
+    const exerciseRepsInput = document.getElementById('exerciseReps');
+    const exerciseWeightInput = document.getElementById('exerciseWeight');
+    const exerciseNotesInput = document.getElementById('exerciseNotes');
+    const currentWeightInput = document.getElementById('currentWeight');
+    const addWeightBtn = document.getElementById('addWeightBtn');
+    const weightHistoryList = document.getElementById('weightHistoryList');
+    const exerciseHistoryDropdown = document.getElementById('exerciseHistoryDropdown');
+    const exerciseHistoryDisplay = document.getElementById('exerciseHistoryDisplay');
+    const dropdownBtn = document.getElementById('dropdownBtn');
+    const dropdownContent = document.getElementById('myDropdown');
+    const editPlanBtn = document.getElementById('editPlanBtn');
+    const resetAppBtn = document.getElementById('resetAppBtn');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const cameraInput = document.getElementById('cameraInput');
+    const photoDisplay = document.getElementById('photoDisplay');
+    const clearPhotoBtn = document.getElementById('clearPhotoBtn');
+    const exerciseChartSelect = document.getElementById('exerciseChartSelect');
+    const exerciseChartMetric = document.getElementById('exerciseChartMetric');
 
-  const semanaActual = getWeekNumber(hoy);
-  if (localStorage.getItem("semanaApp") !== semanaActual) {
-    localStorage.setItem("semanaApp", semanaActual);
-    ['d1','d2','d3'].forEach(d => localStorage.removeItem(d)); // Borra los checks
-  }
+    // --- Funciones de Utilidad ---
 
-  // --- Dark Mode Logic ---
-  const darkModeToggle = document.getElementById('darkModeToggle');
-  function setDarkMode(isDark) {
-    if (isDark) {
-      document.body.classList.add('dark-mode');
-      localStorage.setItem('darkMode', 'enabled');
-    } else {
-      document.body.classList.remove('dark-mode');
-      localStorage.setItem('darkMode', 'disabled');
-    }
-    // Re-render charts to apply new colors
-    updateWeightChart();
-    updateExerciseChart();
-  }
-
-  // Check user preference on load
-  if (localStorage.getItem('darkMode') === 'enabled') {
-    setDarkMode(true);
-    darkModeToggle.checked = true;
-  } else {
-    setDarkMode(false);
-    darkModeToggle.checked = false;
-  }
-
-  // Toggle on click
-  darkModeToggle.addEventListener('change', () => {
-    setDarkMode(darkModeToggle.checked);
-  });
-
-  // --- Calendario Semanal ---
-  function guardarCheck(id) {
-    localStorage.setItem(id, document.getElementById(id).checked);
-    contarChecks();
-  }
-
-  function cargarChecks() {
-    ['d1','d2','d3'].forEach(id => {
-      const val = localStorage.getItem(id);
-      if (val === 'true') document.getElementById(id).checked = true;
-    });
-    contarChecks();
-  }
-
-  function contarChecks() {
-    let total = 0;
-    ['d1','d2','d3'].forEach(id => {
-      if (document.getElementById(id).checked) total++;
-    });
-    document.getElementById("semanaCompletadas").innerText = total;
-  }
-
-  let planEntrenamientoIndex = JSON.parse(localStorage.getItem("planEntrenamiento") || "{}");
-  let ejerciciosCalendario = {}; // Variable global para almacenar todos los ejercicios de todos los días
-
-  function cargarEjerciciosDias() {
-    // Buscar los días por defecto (Día 1, Día 2, Día 3) en el nuevo planEntrenamiento
-    const d1 = Object.values(planEntrenamientoIndex).find(day => day.name.toLowerCase().includes("día 1") || day.name.toLowerCase().includes("dia 1"));
-    const d2 = Object.values(planEntrenamientoIndex).find(day => day.name.toLowerCase().includes("día 2") || day.name.toLowerCase().includes("dia 2"));
-    const d3 = Object.values(planEntrenamientoIndex).find(day => day.name.toLowerCase().includes("día 3") || day.name.toLowerCase().includes("dia 3"));
-
-    document.getElementById("ejD1").innerHTML = d1 ? d1.ejercicios.map(ej => `<li>${ej}</li>`).join("") : '<li>No configurado (configura en "Editar Ejercicios Diarios")</li>';
-    document.getElementById("ejD2").innerHTML = d2 ? d2.ejercicios.map(ej => `<li>${ej}</li>`).join("") : '<li>No configurado (configura en "Editar Ejercicios Diarios")</li>';
-    document.getElementById("ejD3").innerHTML = d3 ? d3.ejercicios.map(ej => `<li>${ej}</li>`).join("") : '<li>No configurado (configura en "Editar Ejercicios Diarios")</li>';
-
-    // Almacenar en la variable global para selección (todos los ejercicios de todos los días)
-    const allExercisesForSelection = [];
-    Object.values(planEntrenamientoIndex).forEach(day => {
-        if (day.ejercicios) allExercisesForSelection.push(...day.ejercicios);
-    });
-    // Eliminar duplicados y ordenar para el select de "Añadir del Calendario"
-    ejerciciosCalendario = [...new Set(allExercisesForSelection)].sort();
-    populateCalendarExercisesDropdown();
-  }
-
-  function populateCalendarExercisesDropdown() {
-      const select = document.getElementById("selectEjercicioCalendario");
-      select.innerHTML = '<option value="">Selecciona un ejercicio...</option>'; // Reset
-      
-      ejerciciosCalendario.forEach(ej => {
-          const option = document.createElement("option");
-          option.value = ej;
-          option.textContent = ej;
-          select.appendChild(option);
-      });
-  }
-
-  // --- Seguimiento de Peso ---
-  let pesos = JSON.parse(localStorage.getItem("peso_historial") || "[]");
-  let weightChartInstance = null; // Para la instancia del gráfico de peso
-
-  function savePeso() {
-    const pesoInput = document.getElementById("peso");
-    const p = parseFloat(pesoInput.value);
-    const pesoMessage = document.getElementById("pesoMessage");
-
-    if (isNaN(p) || p <= 0) {
-      pesoMessage.innerText = "Por favor, introduce un peso válido.";
-      pesoMessage.className = "message error";
-      pesoMessage.style.display = "block";
-      return;
+    // Función auxiliar para ocultar el dropdown después de una acción
+    function hideDropdown() {
+        dropdownContent.style.display = "none";
     }
 
-    const fecha = new Date().toLocaleDateString("es-ES"); // Formato local
-    const hora = new Date().toLocaleTimeString("es-ES", {hour: '2-digit', minute:'2-digit'});
-
-    pesos.push({ fecha: fecha, hora: hora, peso: p });
-    localStorage.setItem("peso_historial", JSON.stringify(pesos));
-    pesoInput.value = ''; // Limpiar el campo
-    
-    pesoMessage.innerText = "Peso guardado: " + p + " kg";
-    pesoMessage.className = "message success";
-    pesoMessage.style.display = "block";
-    setTimeout(() => { pesoMessage.style.display = "none"; }, 3000);
-    displayPesoHistory();
-    updateWeightChart(); // Actualizar el gráfico
-  }
-
-  function displayPesoHistory() {
-    const tbody = document.querySelector("#pesoHistoryTable tbody");
-    tbody.innerHTML = "";
-    const groupedPesos = pesos.reduce((acc, entry) => {
-      if (!acc[entry.fecha]) {
-        acc[entry.fecha] = [];
-      }
-      acc[entry.fecha].push(entry);
-      return acc;
-    }, {});
-
-    const sortedDates = Object.keys(groupedPesos).sort((a, b) => {
-      const [dayA, monthA, yearA] = a.split('/');
-      const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
-      const [dayB, monthB, yearB] = b.split('/');
-      const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
-      return dateB - dateA;
-    });
-
-    sortedDates.forEach(date => {
-      const dateRow = document.createElement("tr");
-      dateRow.innerHTML = `<td colspan="3" class="date-header">${date}</td>`;
-      tbody.appendChild(dateRow);
-
-      groupedPesos[date].sort((a,b) => {
-        const [ha, ma] = a.hora.split(':').map(Number);
-        const [hb, mb] = b.hora.split(':').map(Number);
-        if (ha !== hb) return ha - hb;
-        return ma - mb;
-      });
-
-      groupedPesos[date].forEach((entry, index) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-          <td></td>
-          <td>${entry.peso} kg (${entry.hora})</td>
-          <td>
-            <button class="small-btn button-danger" onclick="deletePesoEntry('${entry.fecha}', '${entry.hora}')">🗑</button>
-          </td>
-        `;
-        tbody.appendChild(row);
-      });
-    });
-
-    if (pesos.length === 0) {
-      const noDataRow = document.createElement("tr");
-      noDataRow.innerHTML = `<td colspan="3">No hay historial de peso.</td>`;
-      tbody.appendChild(noDataRow);
-    }
-  }
-
-  function deletePesoEntry(dateToDelete, timeToDelete) {
-    if (confirm(`¿Estás seguro de que quieres borrar la entrada de peso de ${dateToDelete} a las ${timeToDelete}?`)) {
-      pesos = pesos.filter(entry => !(entry.fecha === dateToDelete && entry.hora === timeToDelete));
-      localStorage.setItem("peso_historial", JSON.stringify(pesos));
-      displayPesoHistory();
-      updateWeightChart(); // Actualizar el gráfico
-      alert("Entrada de peso borrada.");
-    }
-  }
-
-  function confirmClearPeso() {
-    if (confirm("¿Estás seguro de que quieres borrar todo el historial de peso? Esta acción es irreversible.")) {
-      clearPesoHistory();
-    }
-  }
-
-  function clearPesoHistory() {
-    localStorage.removeItem("peso_historial");
-    pesos = [];
-    document.getElementById("pesoMessage").style.display = "none";
-    displayPesoHistory();
-    updateWeightChart(); // Actualizar el gráfico
-    alert("Historial de peso borrado.");
-  }
-
-  // --- Gráficos de Progreso ---
-  function updateWeightChart() {
-    const ctx = document.getElementById('weightChart').getContext('2d');
-    if (weightChartInstance) {
-      weightChartInstance.destroy(); // Destruir la instancia anterior si existe
+    // Guardar datos en localStorage
+    function savePlan() {
+        localStorage.setItem("planEntrenamiento", JSON.stringify(planEntrenamientoIndex));
     }
 
-    // Ordenar los pesos por fecha para el gráfico
-    const sortedPesos = [...pesos].sort((a, b) => {
-      const [dayA, monthA, yearA] = a.fecha.split('/');
-      const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
-      const [dayB, monthB, yearB] = b.fecha.split('/');
-      const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
-      // Si las fechas son iguales, ordenar por hora
-      if (dateA.getTime() === dateB.getTime()) {
-          const [hA, mA] = a.hora.split(':').map(Number);
-          const [hB, mB] = b.hora.split(':').map(Number);
-          return (hA * 60 + mA) - (hB * 60 + mB);
-      }
-      return dateA - dateB;
-    });
+    function saveEjerciciosSesiones() {
+        localStorage.setItem("ejercicios_sesiones", JSON.stringify(ejerciciosSesiones));
+    }
 
-    const labels = sortedPesos.map(entry => `${entry.fecha} (${entry.hora})`);
-    const data = sortedPesos.map(entry => entry.peso);
+    function savePesos() {
+        localStorage.setItem("peso_historial", JSON.stringify(pesos));
+    }
 
-    // Get computed styles for chart colors
-    const computedStyle = getComputedStyle(document.documentElement);
-    const textColor = computedStyle.getPropertyValue('--text').trim();
-    const borderColor = computedStyle.getPropertyValue('--primary').trim();
-    const gridColor = computedStyle.getPropertyValue('--border').trim();
+    // Cargar datos de localStorage
+    function loadData() {
+        planEntrenamientoIndex = JSON.parse(localStorage.getItem("planEntrenamiento")) || {};
+        ejerciciosSesiones = JSON.parse(localStorage.getItem("ejercicios_sesiones")) || [];
+        pesos = JSON.parse(localStorage.getItem("peso_historial")) || [];
+    }
 
-    weightChartInstance = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: 'Peso (kg)',
-          data: data,
-          borderColor: borderColor,
-          borderWidth: 2,
-          fill: false,
-          tension: 0.1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: false,
-            title: {
-              display: true,
-              text: 'Peso (kg)',
-              color: textColor
-            },
-            ticks: {
-              color: textColor
-            },
-            grid: {
-              color: gridColor
-            }
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Fecha y Hora',
-              color: textColor
-            },
-            ticks: {
-              color: textColor
-            },
-            grid: {
-              color: gridColor
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            labels: {
-              color: textColor
-            }
-          }
+    // Alternar modo oscuro
+    function toggleDarkMode() {
+        document.body.classList.toggle('dark-mode');
+        localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+    }
+
+    // Aplicar modo oscuro al cargar
+    function applyDarkMode() {
+        if (localStorage.getItem('darkMode') === 'true') {
+            document.body.classList.add('dark-mode');
         }
-      }
-    });
-  }
-
-  let exerciseChartInstance = null; // Para la instancia del gráfico de ejercicio
-
-  function populateExerciseChartDropdown() {
-    const select = document.getElementById("exerciseChartSelect");
-    select.innerHTML = '<option value="">Selecciona un ejercicio...</option>';
-    const allExerciseNames = new Set(); // Usar un Set para evitar duplicados
-    ejerciciosSesiones.forEach(session => {
-      session.ejercicios.forEach(ej => {
-        allExerciseNames.add(ej.nombre);
-      });
-    });
-    const sortedExerciseNames = Array.from(allExerciseNames).sort();
-    sortedExerciseNames.forEach(name => {
-      const option = document.createElement("option");
-      option.value = name;
-      option.textContent = name;
-      select.appendChild(option);
-    });
-  }
-
-  function updateExerciseChart() {
-    const selectedExerciseName = document.getElementById("exerciseChartSelect").value;
-    const ctx = document.getElementById('exerciseChart').getContext('2d');
-    if (exerciseChartInstance) {
-      exerciseChartInstance.destroy();
-    }
-    if (!selectedExerciseName) {
-      return; // No hacer nada si no hay ejercicio seleccionado
     }
 
-    // Filtrar datos para el ejercicio seleccionado
-    const exerciseDataPoints = [];
-    ejerciciosSesiones.forEach(session => {
-      const date = session.fecha;
-      session.ejercicios.forEach(ej => {
-        if (ej.nombre === selectedExerciseName && ej.peso && !isNaN(parseFloat(ej.peso))) {
-          exerciseDataPoints.push({ date: date, peso: parseFloat(ej.peso) });
+    // --- Funciones para el Plan de Entrenamiento ---
+
+    // Cargar ejercicios para el día actual
+    function cargarEjerciciosDias() {
+        const daysOfWeek = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+        currentDayDisplay.textContent = daysOfWeek[currentDay];
+        currentDayExercisesDiv.innerHTML = ''; // Limpiar ejercicios anteriores
+
+        const dayKey = `day-${currentDay + 1}`;
+        const dayPlan = planEntrenamientoIndex[dayKey];
+
+        if (dayPlan && dayPlan.ejercicios && dayPlan.ejercicios.length > 0) {
+            currentDayExercisesDiv.innerHTML = `<h3>${dayPlan.name || `Día ${currentDay + 1}`}</h3>`;
+            dayPlan.ejercicios.forEach((ejercicio, index) => {
+                const p = document.createElement('p');
+                const checkboxId = `checkbox-dia-${currentDay + 1}-ejercicio-${index}`;
+                p.innerHTML = `<input type="checkbox" id="${checkboxId}" data-day="${currentDay + 1}" data-exercise-index="${index}" />
+                               <label for="${checkboxId}">${ejercicio}</label>`;
+                currentDayExercisesDiv.appendChild(p);
+            });
+        } else {
+            currentDayExercisesDiv.innerHTML = `<p>No hay ejercicios definidos para el ${daysOfWeek[currentDay]}. Puedes editarlos en "Editar Plan Semanal".</p>`;
         }
-      });
-    });
-
-    // Ordenar los datos por fecha
-    const sortedExerciseData = [...exerciseDataPoints].sort((a, b) => {
-      const [dayA, monthA, yearA] = a.date.split('/');
-      const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
-      const [dayB, monthB, yearB] = b.date.split('/');
-      const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
-      return dateA - dateB;
-    });
-
-    const labels = sortedExerciseData.map(point => point.date);
-    const data = sortedExerciseData.map(point => point.peso);
-
-    // Get computed styles for chart colors
-    const computedStyle = getComputedStyle(document.documentElement);
-    const textColor = computedStyle.getPropertyValue('--text').trim();
-    const accentColor = computedStyle.getPropertyValue('--accent').trim();
-    const gridColor = computedStyle.getPropertyValue('--border').trim();
-
-    exerciseChartInstance = new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels: labels,
-        datasets: [{
-          label: `Peso (kg) para ${selectedExerciseName}`,
-          data: data,
-          borderColor: accentColor,
-          borderWidth: 2,
-          fill: false,
-          tension: 0.1
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          y: {
-            beginAtZero: false,
-            title: {
-              display: true,
-              text: 'Peso (kg)',
-              color: textColor
-            },
-            ticks: {
-              color: textColor
-            },
-            grid: {
-              color: gridColor
-            }
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Fecha',
-              color: textColor
-            },
-            ticks: {
-              color: textColor
-            },
-            grid: {
-              color: gridColor
-            }
-          }
-        },
-        plugins: {
-          legend: {
-            labels: {
-              color: textColor
-            }
-          }
-        }
-      }
-    });
-  }
-
-  // --- Foto de Progreso ---
-  function handleFileSelect(event) {
-    const file = event.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        localStorage.setItem('last_progress_photo', e.target.result);
-        displayLastPhoto();
-      };
-      reader.readAsDataURL(file);
-      alert("Foto guardada localmente.");
-    } else {
-      alert("Por favor, selecciona un archivo de imagen.");
+        cargarChecks(); // Cargar el estado de los checkboxes
     }
-  }
 
-  function displayLastPhoto() {
-    const storedPhoto = localStorage.getItem('last_progress_photo');
-    const imgElement = document.getElementById('lastPhoto');
-    if (storedPhoto) {
-      imgElement.src = storedPhoto;
-      imgElement.style.display = 'block';
-    } else {
-      imgElement.style.display = 'none';
-    }
-  }
-
-  // --- Carga de Ejercicios y Historial (con notas, RPE eliminado) ---
-  let ejerciciosSesiones = JSON.parse(localStorage.getItem("ejercicios_sesiones") || "[]");
-
-  function addFila() {
-    const tbody = document.querySelector("#tablaEjercicios tbody");
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td contenteditable="true"></td>
-      <td contenteditable="true"></td>
-      <td contenteditable="true"></td>
-      <td contenteditable="true"></td>
-      <td><button class="small-btn button-danger" onclick="borrarFilaTablaActual(this.parentNode.parentNode.rowIndex - 1)">🗑️</button></td>
-    `;
-    tbody.appendChild(row);
-    guardarEjerciciosTablaActualTemp();
-  }
-
-  function addEjercicioFromCalendar() {
-    const select = document.getElementById("selectEjercicioCalendario");
-    const selectedExercise = select.value;
-    if (selectedExercise) {
-        const tbody = document.querySelector("#tablaEjercicios tbody");
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td contenteditable="true">${selectedExercise}</td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-            <td contenteditable="true"></td>
-            <td><button class="small-btn button-danger" onclick="borrarFilaTablaActual(this.parentNode.parentNode.rowIndex - 1)">🗑️</button></td>
-        `;
-        tbody.appendChild(row);
-        guardarEjerciciosTablaActualTemp();
-        select.value = ""; // Reset dropdown
-    } else {
-        alert("Por favor, selecciona un ejercicio del calendario.");
-    }
-  }
-
-
-  function cargarEjerciciosTablaActual() {
-    const tbody = document.querySelector("#tablaEjercicios tbody");
-    tbody.innerHTML = "";
-    const currentSessionExercises = JSON.parse(localStorage.getItem("current_session_exercises") || "[]");
-    currentSessionExercises.forEach((e, i) => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td contenteditable="true">${e.nombre}</td>
-        <td contenteditable="true">${e.series}</td>
-        <td contenteditable="true">${e.peso}</td>
-        <td contenteditable="true">${e.notas || ''}</td>
-        <td><button class="small-btn button-danger" onclick="borrarFilaTablaActual(${i})">🗑️</button></td>
-      `;
-      tbody.appendChild(row);
-    });
-  }
-
-  // Guardar temporalmente la tabla de ejercicios actual (sin RPE)
-  function guardarEjerciciosTablaActualTemp() {
-    const filas = document.querySelectorAll("#tablaEjercicios tbody tr");
-    const lista = [];
-    filas.forEach(fila => {
-      const celdas = fila.querySelectorAll("td");
-      if (celdas.length >= 4) { // Ahora 4 celdas: nombre, series, peso, notas
-        lista.push({
-          nombre: celdas[0].innerText.trim(),
-          series: celdas[1].innerText.trim(),
-          peso: celdas[2].innerText.trim(),
-          notas: celdas[3].innerText.trim()
+    // Guardar el estado de los checkboxes
+    function guardarChecks() {
+        const checks = {};
+        document.querySelectorAll('#currentDayExercises input[type="checkbox"]').forEach(checkbox => {
+            const day = checkbox.dataset.day;
+            const index = checkbox.dataset.exerciseIndex;
+            if (!checks[day]) {
+                checks[day] = {};
+            }
+            checks[day][index] = checkbox.checked;
         });
-      }
-    });
-    localStorage.setItem("current_session_exercises", JSON.stringify(lista));
-  }
-
-  function borrarFilaTablaActual(index) {
-    const tbody = document.querySelector("#tablaEjercicios tbody");
-    if (tbody.rows[index]) {
-      tbody.rows[index].remove();
-      guardarEjerciciosTablaActualTemp();
+        localStorage.setItem("checkbox_estados", JSON.stringify(checks));
     }
-  }
 
-  function confirmClearCurrentEjercicios() {
-    if (confirm("¿Estás seguro de que quieres borrar todos los ejercicios de la tabla actual?")) {
-      localStorage.removeItem("current_session_exercises");
-      cargarEjerciciosTablaActual(); // Usar cargarEjerciciosTablaActual para refrescar la tabla vacía
-      const ejerciciosMessage = document.getElementById("ejerciciosMessage");
-      ejerciciosMessage.innerText = "Ejercicios actuales borrados de la tabla.";
-      ejerciciosMessage.className = "message success";
-      ejerciciosMessage.style.display = "block";
-      setTimeout(() => { ejerciciosMessage.style.display = "none"; }, 3000);
-    }
-  }
-
-  function guardarEjerciciosSesion() {
-    const filas = document.querySelectorAll("#tablaEjercicios tbody tr");
-    const listaEjerciciosSesion = [];
-    filas.forEach(fila => {
-      const celdas = fila.querySelectorAll("td");
-      if (celdas.length >= 4) { // Asegurarse de capturar los campos correctos
-        listaEjerciciosSesion.push({
-          nombre: celdas[0].innerText.trim(),
-          series: celdas[1].innerText.trim(),
-          peso: celdas[2].innerText.trim(),
-          notas: celdas[3].innerText.trim()
+    // Cargar el estado de los checkboxes
+    function cargarChecks() {
+        const checks = JSON.parse(localStorage.getItem("checkbox_estados") || "{}");
+        document.querySelectorAll('#currentDayExercises input[type="checkbox"]').forEach(checkbox => {
+            const day = checkbox.dataset.day;
+            const index = checkbox.dataset.exerciseIndex;
+            if (checks[day] && checks[day][index] !== undefined) {
+                checkbox.checked = checks[day][index];
+            }
         });
-      }
+    }
+
+    // Reiniciar los checkboxes para el día actual
+    function resetChecksForCurrentDay() {
+        const checks = JSON.parse(localStorage.getItem("checkbox_estados") || "{}");
+        const dayKey = `day-${currentDay + 1}`;
+        if (checks[dayKey]) {
+            delete checks[dayKey]; // Eliminar el estado de los checkboxes para el día actual
+        }
+        localStorage.setItem("checkbox_estados", JSON.stringify(checks));
+        cargarChecks(); // Volver a cargar para reflejar el cambio
+    }
+
+    // --- Event Listeners para Navegación de Días ---
+    prevDayBtn.addEventListener('click', () => {
+        currentDay = (currentDay - 1 + 7) % 7; // Ir al día anterior, ciclando
+        cargarEjerciciosDias();
+        resetChecksForCurrentDay(); // Reiniciar checks al cambiar de día
     });
 
-    if (listaEjerciciosSesion.length === 0) {
-      const ejerciciosMessage = document.getElementById("ejerciciosMessage");
-      ejerciciosMessage.innerText = "No hay ejercicios para guardar en la sesión.";
-      ejerciciosMessage.className = "message error";
-      ejerciciosMessage.style.display = "block";
-      setTimeout(() => { ejerciciosMessage.style.display = "none"; }, 3000);
-      return;
-    }
-
-    const fechaActual = new Date().toLocaleDateString("es-ES");
-    const indexExistente = ejerciciosSesiones.findIndex(s => s.fecha === fechaActual);
-
-    if (indexExistente !== -1) {
-      ejerciciosSesiones[indexExistente].ejercicios = listaEjerciciosSesion;
-    } else {
-      ejerciciosSesiones.push({ fecha: fechaActual, ejercicios: listaEjerciciosSesion });
-    }
-
-    localStorage.setItem("ejercicios_sesiones", JSON.stringify(ejerciciosSesiones));
-    const ejerciciosMessage = document.getElementById("ejerciciosMessage");
-    ejerciciosMessage.innerText = "Sesión de ejercicios guardada correctamente.";
-    ejerciciosMessage.className = "message success";
-    ejerciciosMessage.style.display = "block";
-    setTimeout(() => { ejerciciosMessage.style.display = "none"; }, 3000);
-
-    populateExerciseHistoryDropdown(); // Actualizar dropdown del historial
-    populateExerciseChartDropdown(); // Actualizar dropdown de gráficos
-  }
-
-  function populateExerciseHistoryDropdown() {
-    const select = document.getElementById("selectHistoryDate");
-    select.innerHTML = ""; // Limpiar opciones anteriores
-    // Ordenar sesiones por fecha (más reciente primero)
-    const sortedSessions = [...ejerciciosSesiones].sort((a, b) => {
-        const [dayA, monthA, yearA] = a.fecha.split('/');
-        const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
-        const [dayB, monthB, yearB] = b.fecha.split('/');
-        const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
-        return dateB - dateA; // Para ordenar de más reciente a más antigua
+    nextDayBtn.addEventListener('click', () => {
+        currentDay = (currentDay + 1) % 7; // Ir al día siguiente, ciclando
+        cargarEjerciciosDias();
+        resetChecksForCurrentDay(); // Reiniciar checks al cambiar de día
     });
 
-    if (sortedSessions.length === 0) {
-        const option = document.createElement("option");
-        option.value = "";
-        option.textContent = "No hay sesiones guardadas";
-        select.appendChild(option);
-        document.getElementById("exerciseHistoryDisplay").innerHTML = "<p>No hay historial de sesiones para mostrar.</p>";
-        return;
-    }
+    // --- Añadir Ejercicio a la Sesión Actual ---
+    addExerciseBtn.addEventListener('click', () => {
+        const name = exerciseNameInput.value.trim();
+        const sets = parseInt(exerciseSetsInput.value);
+        const reps = parseInt(exerciseRepsInput.value);
+        const weight = parseFloat(exerciseWeightInput.value);
+        const notes = exerciseNotesInput.value.trim();
 
-    sortedSessions.forEach(session => {
-      const option = document.createElement("option");
-      option.value = session.fecha;
-      option.textContent = session.fecha;
-      select.appendChild(option);
+        if (!name) {
+            alert("Por favor, introduce el nombre del ejercicio.");
+            return;
+        }
+        if (isNaN(sets) || sets <= 0) {
+            alert("Por favor, introduce un número válido de series (mayor que 0).");
+            return;
+        }
+        if (isNaN(reps) || reps <= 0) {
+            alert("Por favor, introduce un número válido de repeticiones (mayor que 0).");
+            return;
+        }
+        if (isNaN(weight) || weight < 0) {
+            alert("Por favor, introduce un peso válido (mayor o igual a 0).");
+            return;
+        }
+
+        const newExercise = {
+            date: new Date().toISOString().split('T')[0], // Formato YYYY-MM-DD
+            dayIndex: currentDay,
+            name: name,
+            sets: sets,
+            reps: reps,
+            weight: weight,
+            notes: notes
+        };
+
+        ejerciciosSesiones.push(newExercise);
+        saveEjerciciosSesiones();
+        alert('Ejercicio añadido a la sesión actual!');
+        
+        // Limpiar campos
+        exerciseNameInput.value = '';
+        exerciseSetsInput.value = '';
+        exerciseRepsInput.value = '';
+        exerciseWeightInput.value = '';
+        exerciseNotesInput.value = '';
+
+        populateExerciseChartDropdown(); // Actualizar el dropdown de gráficos
+        populateExerciseHistoryDropdown(); // Actualizar el dropdown de historial
     });
 
-    // Seleccionar y mostrar la sesión más reciente por defecto
-    select.value = sortedSessions[0].fecha;
-    displaySelectedExerciseSession();
-  }
+    // --- Finalizar Día de Entrenamiento ---
+    finishDayBtn.addEventListener('click', () => {
+        // Aquí podrías añadir lógica adicional como un resumen del día, o simplemente resetear.
+        alert('Día de entrenamiento finalizado! Se han guardado tus progresos.');
+        // Opcional: limpiar los campos de entrada de ejercicio al finalizar el día
+        exerciseNameInput.value = '';
+        exerciseSetsInput.value = '';
+        exerciseRepsInput.value = '';
+        exerciseWeightInput.value = '';
+        exerciseNotesInput.value = '';
+        
+        // Reiniciar los checks para el día actual
+        resetChecksForCurrentDay();
+    });
 
-  function displaySelectedExerciseSession() {
-    const selectedDate = document.getElementById("selectHistoryDate").value;
-    const displayDiv = document.getElementById("exerciseHistoryDisplay");
-    displayDiv.innerHTML = "";
+    // --- Funciones para Historial de Ejercicios ---
 
-    const session = ejerciciosSesiones.find(s => s.fecha === selectedDate);
-    if (session) {
-      let html = `<h3 class="exercise-history-table">Sesión del ${session.fecha}</h3>`;
-      html += `
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr><th>Ejercicio</th><th>Series</th><th>Peso (kg)</th><th>Notas</th></tr>
-                </thead>
-                <tbody>
-      `;
-      session.ejercicios.forEach(ej => {
-        html += `
-          <tr>
-            <td>${ej.nombre}</td>
-            <td>${ej.series}</td>
-            <td>${ej.peso}</td>
-            <td>${ej.notas || '-'}</td>
-          </tr>
-        `;
-      });
-      html += `
-                </tbody>
-            </table>
-        </div>
-        <button class="button-danger small-btn" onclick="confirmDeleteSession('${session.fecha}')">🗑️ Borrar Sesión</button>
-      `;
-      displayDiv.innerHTML = html;
-    } else {
-      displayDiv.innerHTML = "<p>No se encontraron datos para la fecha seleccionada.</p>";
-    }
-  }
-
-  function confirmDeleteSession(dateToDelete) {
-    if (confirm(`¿Estás seguro de que quieres borrar la sesión de ejercicios del ${dateToDelete}? Esta acción es irreversible.`)) {
-      ejerciciosSesiones = ejerciciosSesiones.filter(s => s.fecha !== dateToDelete);
-      localStorage.setItem("ejercicios_sesiones", JSON.stringify(ejerciciosSesiones));
-      populateExerciseHistoryDropdown();
-      populateExerciseChartDropdown(); // Actualizar el select de gráficos
-      updateExerciseChart(); // Refrescar el gráfico si el ejercicio borrado era el seleccionado
-      alert("Sesión borrada.");
-    }
-  }
-
-  function confirmClearAllExerciseHistory() {
-    if (confirm("¿Estás seguro de que quieres borrar TODO el historial de sesiones de ejercicios? Esta acción es irreversible.")) {
-      clearAllExerciseHistory();
-    }
-  }
-
-  function clearAllExerciseHistory() {
-    localStorage.removeItem("ejercicios_sesiones");
-    ejerciciosSesiones = [];
-    populateExerciseHistoryDropdown();
-    populateExerciseChartDropdown(); // Limpiar también el select del gráfico
-    updateExerciseChart(); // Limpiar el gráfico
-    alert("Todo el historial de ejercicios ha sido borrado.");
-  }
-
-
-  // --- Temporizador ---
-  let timerInterval;
-  let timeLeft;
-  const countdownDisplay = document.getElementById('countdownDisplay');
-  const timerStartBtn = document.getElementById('timerStartBtn');
-  const timerResetBtn = document.getElementById('timerResetBtn');
-
-  function startTimer() {
-    const minutesInput = document.getElementById('restTime');
-    let duration = parseInt(minutesInput.value, 10);
-
-    if (isNaN(duration) || duration <= 0) {
-      alert('Por favor, introduce un tiempo de descanso válido en segundos.');
-      return;
+    // Llenar el dropdown con todos los ejercicios registrados
+    function populateExerciseHistoryDropdown() {
+        exerciseHistoryDropdown.innerHTML = '<option value="">Selecciona un ejercicio para ver su historial</option>';
+        const uniqueExercises = [...new Set(ejerciciosSesiones.map(ej => ej.name))];
+        uniqueExercises.sort().forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            exerciseHistoryDropdown.appendChild(option);
+        });
     }
 
-    timeLeft = duration;
-    timerStartBtn.style.display = 'none';
-    timerResetBtn.style.display = 'inline-block';
-    minutesInput.disabled = true; // Deshabilitar input mientras corre el temporizador
+    // Mostrar el historial de un ejercicio seleccionado
+    exerciseHistoryDropdown.addEventListener('change', () => {
+        const selectedExerciseName = exerciseHistoryDropdown.value;
+        exerciseHistoryDisplay.innerHTML = ''; // Limpiar antes de mostrar
 
-    clearInterval(timerInterval); // Limpiar cualquier intervalo anterior
-    timerInterval = setInterval(() => {
-      if (timeLeft <= 0) {
-        clearInterval(timerInterval);
-        countdownDisplay.innerText = '¡Tiempo!';
-        timerStartBtn.style.display = 'inline-block';
-        timerResetBtn.style.display = 'none';
-        minutesInput.disabled = false; // Habilitar input
-        new Audio('https://www.soundjay.com/buttons/beep-07a.mp3').play(); // Reproducir sonido
-      } else {
-        countdownDisplay.innerText = formatTime(timeLeft);
-        timeLeft--;
-      }
-    }, 1000);
-  }
+        if (selectedExerciseName) {
+            const filteredHistory = ejerciciosSesiones
+                .filter(ej => ej.name === selectedExerciseName)
+                .sort((a, b) => new Date(b.date) - new Date(a.date)); // Ordenar por fecha descendente
 
-  function resetTimer() {
-    clearInterval(timerInterval);
-    countdownDisplay.innerText = '';
-    document.getElementById('restTime').disabled = false; // Habilitar input
-    timerStartBtn.style.display = 'inline-block';
-    timerResetBtn.style.display = 'none';
-  }
+            if (filteredHistory.length > 0) {
+                const ul = document.createElement('ul');
+                ul.classList.add('exercise-list');
+                filteredHistory.forEach(ej => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `
+                        <div class="exercise-info">
+                            <strong>${ej.date}</strong><br>
+                            Series: <span>${ej.sets}</span>, Reps: <span>${ej.reps}</span>, Peso: <span>${ej.weight}kg</span><br>
+                            Notas: <em>${ej.notes || 'N/A'}</em>
+                        </div>
+                    `;
+                    ul.appendChild(li);
+                });
+                exerciseHistoryDisplay.appendChild(ul);
+            } else {
+                exerciseHistoryDisplay.innerHTML = '<p>No hay historial para este ejercicio.</p>';
+            }
+        }
+    });
 
-  function formatTime(seconds) {
-    const mins = Math.floor(seconds / 60);
-    const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  }
+    // --- Funciones para el Seguimiento de Peso ---
+
+    // Mostrar el historial de peso en la lista
+    function displayPesoHistory() {
+        weightHistoryList.innerHTML = '';
+        // Mostrar los últimos 10 pesos, ordenados por fecha descendente
+        const sortedPesos = [...pesos].sort((a, b) => new Date(b.date) - new Date(a.date));
+        sortedPesos.slice(0, 10).forEach(entry => {
+            const li = document.createElement('li');
+            li.textContent = `${entry.date}: ${entry.weight} kg`;
+            weightHistoryList.appendChild(li);
+        });
+    }
+
+    // Añadir nuevo peso
+    addWeightBtn.addEventListener('click', () => {
+        const weight = parseFloat(currentWeightInput.value);
+        if (isNaN(weight) || weight <= 0) {
+            alert("Por favor, introduce un peso válido (mayor que 0).");
+            return;
+        }
+        const date = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
+        pesos.push({ date, weight });
+        savePesos();
+        displayPesoHistory();
+        updateWeightChart(); // Actualizar gráfico al añadir nuevo peso
+        currentWeightInput.value = ''; // Limpiar campo
+    });
+
+    // --- Gráficos con Chart.js ---
+
+    // Gráfico de peso
+    function updateWeightChart() {
+        if (weightChartInstance) {
+            weightChartInstance.destroy(); // Destruir instancia anterior si existe
+        }
+
+        // Ordenar pesos por fecha para el gráfico
+        const sortedPesos = [...pesos].sort((a, b) => new Date(a.date) - new Date(b.date));
+        const labels = sortedPesos.map(entry => entry.date);
+        const data = sortedPesos.map(entry => entry.weight);
+
+        const ctx = document.getElementById('weightChart').getContext('2d');
+        weightChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Peso (kg)',
+                    data: data,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: getComputedStyle(document.body).getPropertyValue('--text')
+                        },
+                        grid: {
+                            color: getComputedStyle(document.body).getPropertyValue('--border')
+                        }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            color: getComputedStyle(document.body).getPropertyValue('--text')
+                        },
+                        grid: {
+                            color: getComputedStyle(document.body).getPropertyValue('--border')
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: getComputedStyle(document.body).getPropertyValue('--text')
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    // Llenar el select de ejercicios para el gráfico
+    function populateExerciseChartDropdown() {
+        exerciseChartSelect.innerHTML = '<option value="">Seleccione un ejercicio</option>';
+        const uniqueExercises = [...new Set(ejerciciosSesiones.map(ej => ej.name))];
+        uniqueExercises.sort().forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            exerciseChartSelect.appendChild(option);
+        });
+    }
+
+    // Gráfico de progreso de ejercicios
+    function updateExerciseChart() {
+        if (exerciseChartInstance) {
+            exerciseChartInstance.destroy(); // Destruir instancia anterior si existe
+        }
+
+        const selectedExerciseName = exerciseChartSelect.value;
+        const selectedMetric = exerciseChartMetric.value;
+
+        if (!selectedExerciseName || !selectedMetric) {
+            return; // No dibujar si no hay selección completa
+        }
+
+        const filteredData = ejerciciosSesiones
+            .filter(ej => ej.name === selectedExerciseName)
+            .sort((a, b) => new Date(a.date) - new Date(b.date)); // Ordenar por fecha
+
+        const labels = filteredData.map(entry => entry.date);
+        const data = filteredData.map(entry => entry[selectedMetric]);
+
+        const ctx = document.getElementById('exerciseChart').getContext('2d');
+        exerciseChartInstance = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: `${selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} de ${selectedExerciseName}`,
+                    data: data,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: getComputedStyle(document.body).getPropertyValue('--text')
+                        },
+                        grid: {
+                            color: getComputedStyle(document.body).getPropertyValue('--border')
+                        }
+                    },
+                    y: {
+                        beginAtZero: false,
+                        ticks: {
+                            color: getComputedStyle(document.body).getPropertyValue('--text')
+                        },
+                        grid: {
+                            color: getComputedStyle(document.body).getPropertyValue('--border')
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: getComputedStyle(document.body).getPropertyValue('--text')
+                        }
+                    }
+                }
+            }
+        });
+    }
+
+    exerciseChartSelect.addEventListener('change', updateExerciseChart);
+    exerciseChartMetric.addEventListener('change', updateExerciseChart);
 
 
-  // --- Import/Export ---
-  function exportData() {
-    const data = {
-      peso_historial: JSON.parse(localStorage.getItem("peso_historial") || "[]"),
-      ejercicios_sesiones: JSON.parse(localStorage.getItem("ejercicios_sesiones") || "[]"),
-      planEntrenamiento: JSON.parse(localStorage.getItem("planEntrenamiento") || "{}"),
-      last_progress_photo: localStorage.getItem("last_progress_photo"),
-      darkMode: localStorage.getItem("darkMode"),
-      // Incluir cualquier otra clave de localStorage relevante si es necesario
-    };
-    const dataStr = JSON.stringify(data, null, 2);
-    const blob = new Blob([dataStr], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "mi_plan_fit_data.json";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-    alert("Datos exportados correctamente.");
-  }
+    // --- Funciones para la Gestión de Fotos ---
 
-  document.getElementById('importFileInput').addEventListener('change', (event) => {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
+    // Mostrar la última foto guardada
+    function displayLastPhoto() {
         try {
-          const importedData = JSON.parse(e.target.result);
-          if (confirm("¿Estás seguro de que quieres importar estos datos? Esto sobrescribirá tus datos actuales.")) {
-            // Importar cada sección de datos
-            if (importedData.peso_historial) localStorage.setItem("peso_historial", JSON.stringify(importedData.peso_historial));
-            if (importedData.ejercicios_sesiones) localStorage.setItem("ejercicios_sesiones", JSON.stringify(importedData.ejercicios_sesiones));
-            if (importedData.planEntrenamiento) localStorage.setItem("planEntrenamiento", JSON.stringify(importedData.planEntrenamiento));
-            if (importedData.last_progress_photo) localStorage.setItem("last_progress_photo", importedData.last_progress_photo);
-            // Si el modo oscuro está en los datos importados, aplicarlo
-            if (importedData.darkMode) {
-              localStorage.setItem("darkMode", importedData.darkMode);
-              setDarkMode(importedData.darkMode === 'enabled');
-              darkModeToggle.checked = (importedData.darkMode === 'enabled');
+            const lastPhoto = localStorage.getItem('last_progress_photo');
+            if (lastPhoto) {
+                photoDisplay.src = lastPhoto;
+                photoDisplay.style.display = 'block';
+                clearPhotoBtn.style.display = 'inline-block';
+            } else {
+                photoDisplay.style.display = 'none';
+                clearPhotoBtn.style.display = 'none';
             }
-            
-            // Recargar toda la UI para reflejar los nuevos datos
-            location.reload(); 
-            alert("Datos importados correctamente. La página se recargará.");
-          }
         } catch (error) {
-          alert("Error al importar el archivo. Asegúrate de que sea un archivo JSON válido.");
-          console.error("Error importing file:", error);
+            console.error("Error al cargar la foto:", error);
+            photoDisplay.style.display = 'none';
+            clearPhotoBtn.style.display = 'none';
         }
-      };
-      reader.readAsText(file);
-    } else {
-        // Clear the file input if user cancels to allow re-selection of the same file
-        event.target.value = ''; 
-      }
-  });
+    }
 
+    // Manejar la captura de la foto
+    cameraInput.addEventListener('change', (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                localStorage.setItem('last_progress_photo', e.target.result);
+                displayLastPhoto();
+            };
+            reader.readAsDataURL(file);
+        }
+    });
 
-  // --- Dropdown Toggle Logic (New) ---
-  const dropdownBtn = document.getElementById("dropdownBtn");
-  const dropdownContent = document.getElementById("dropdownContent");
+    // Eliminar la foto guardada
+    clearPhotoBtn.addEventListener('click', () => {
+        if (confirm("¿Estás seguro de que quieres eliminar la última foto?")) {
+            localStorage.removeItem('last_progress_photo');
+            displayLastPhoto();
+            alert("Foto eliminada.");
+        }
+    });
 
-  dropdownBtn.addEventListener("click", function(event) {
-      event.stopPropagation(); // Prevenir que el clic en el botón se propague al documento
-      dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
-  });
+    // --- Funciones para el Menú Dropdown (Header) ---
+    dropdownBtn.addEventListener('click', (event) => {
+        dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
+        event.stopPropagation(); // Evitar que el clic en el botón cierre el dropdown inmediatamente
+    });
 
-  // Cerrar el dropdown si se hace clic fuera de él
-  document.addEventListener("click", function(event) {
-      if (!dropdownContent.contains(event.target) && event.target !== dropdownBtn) {
-          dropdownContent.style.display = "none";
-      }
-  });
+    // Cerrar el dropdown si se hace clic fuera
+    window.addEventListener('click', (event) => {
+        if (!event.target.matches('#dropdownBtn')) {
+            hideDropdown();
+        }
+    });
 
-  // Función auxiliar para ocultar el dropdown después de una acción
-  function hideDropdown() {
-      dropdownContent.style.display = "none";
-  }
+    editPlanBtn.addEventListener('click', (event) => {
+        event.preventDefault(); // Prevenir navegación por defecto
+        hideDropdown();
+        window.location.href = 'editar_dias.html'; // Navegar a la página de edición
+    });
 
+    resetAppBtn.addEventListener('click', (event) => {
+        event.preventDefault(); // Prevenir navegación por defecto
+        hideDropdown();
+        if (confirm("¿Estás seguro de que quieres resetear la aplicación? Se eliminarán todos tus datos (plan de entrenamiento, historial de ejercicios, historial de peso, fotos y estado de los checkboxes). Esta acción no se puede deshacer.")) {
+            localStorage.clear();
+            alert("Aplicación reseteada. Recargando...");
+            window.location.reload(); // Recargar la página para limpiar todo
+        }
+    });
 
-  // --- Inicialización al Cargar la Página ---
-  document.addEventListener('DOMContentLoaded', () => {
-    cargarChecks();
-    
-    planEntrenamientoIndex = JSON.parse(localStorage.getItem("planEntrenamiento") || "{}");
-    cargarEjerciciosDias();
+    darkModeToggle.addEventListener('click', toggleDarkMode);
 
-    pesos = JSON.parse(localStorage.getItem("peso_historial") || "[]"); // Asegurarse de que pesos esté actualizado antes de chart
-    displayPesoHistory();
-    updateWeightChart(); // Cargar gráfico de peso al inicio
+    // --- Inicialización al Cargar la Página ---
+    document.addEventListener('DOMContentLoaded', () => {
+        applyDarkMode(); // Aplicar el modo oscuro al inicio
+        loadData(); // Cargar todos los datos
+        
+        // Cargar el plan de entrenamiento con valores por defecto si no existe
+        if (Object.keys(planEntrenamientoIndex).length === 0) {
+            planEntrenamientoIndex['day-1'] = { name: "Día 1 - Full Body Fuerza", ejercicios: ["Peso muerto rumano", "Dominadas asistidas", "Press inclinado", "Plancha", "Bird-dogs"] };
+            planEntrenamientoIndex['day-2'] = { name: "Día 2 - Hipertrofia + Core", ejercicios: ["Sentadilla goblet", "Remo con barra", "Z-Press", "Plancha reach", "Hollow hold"] };
+            planEntrenamientoIndex['day-3'] = { name: "Día 3 - Cardio + Core", ejercicios: ["Caminata inclinada", "2 abdominales a elección", "Movilidad 10 min"] };
+            savePlan(); // Guardar los valores por defecto
+        }
 
-    ejerciciosSesiones = JSON.parse(localStorage.getItem("ejercicios_sesiones") || "[]"); // Asegurarse de que esté actualizado
-    populateExerciseChartDropdown(); // Llenar el select de ejercicios para el gráfico
-    // updateExerciseChart(); // No llamar aquí, se llama cuando el usuario selecciona
+        // Determinar el día actual basado en el día de la semana real si es la primera carga
+        if (localStorage.getItem("currentDayIndex") === null) {
+            const today = new Date();
+            currentDay = (today.getDay() + 6) % 7; // 0=Domingo, 1=Lunes... a 0=Lunes, 1=Martes...
+            localStorage.setItem("currentDayIndex", currentDay);
+        } else {
+            currentDay = parseInt(localStorage.getItem("currentDayIndex"));
+        }
+        
+        cargarEjerciciosDias(); // Cargar los ejercicios para el día inicial
+        
+        displayPesoHistory(); // Cargar y mostrar el historial de peso
+        updateWeightChart(); // Cargar gráfico de peso al inicio
 
-    cargarEjerciciosTablaActual();
-    populateExerciseHistoryDropdown();
-    displayLastPhoto();
-  });
+        populateExerciseChartDropdown(); // Llenar el select de ejercicios para el gráfico
+        populateExerciseHistoryDropdown(); // Llenar el select de historial de ejercicios
+        
+        displayLastPhoto(); // Mostrar la última foto guardada
+        
+        // Manejar los cambios en los checkboxes de los ejercicios del día
+        currentDayExercisesDiv.addEventListener('change', (event) => {
+            if (event.target.type === 'checkbox') {
+                guardarChecks();
+            }
+        });
 
-  // Service Worker Registration
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/service-worker.js')
-        .then(registration => {
-          console.log('Service Worker registrado con éxito:', registration);
-        })
-        .catch(error => {
-          console.log('Fallo el registro del Service Worker:', error);
+        // Asegurarse de que al cambiar de día, el `currentDayIndex` se guarde
+        prevDayBtn.addEventListener('click', () => {
+            localStorage.setItem("currentDayIndex", currentDay);
+        });
+        nextDayBtn.addEventListener('click', () => {
+            localStorage.setItem("currentDayIndex", currentDay);
         });
     });
-  }
-</script>
+
+    // Service Worker Registration
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/service-worker.js')
+          .then(registration => {
+            console.log('Service Worker registrado con éxito:', registration);
+          })
+          .catch(error => {
+            console.log('Fallo el registro del Service Worker:', error);
+          });
+      });
+    }
+  </script>
 </body>
 </html>

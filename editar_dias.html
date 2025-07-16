@@ -15,6 +15,8 @@
             --danger: #dc3545;
             --border: #e0e0e0; /* Nuevo para consistencia con index.html */
             --input-bg: #ffffff; /* Nuevo para consistencia con index.html */
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --font-family: 'Inter', sans-serif;
         }
         body.dark-mode { /* Añadido para que editar_dias también respete el modo oscuro */
             --bg: #1a1a2e;
@@ -25,551 +27,313 @@
             --danger: #f44336;
             --border: #44445c;
             --input-bg: #2a2a40;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
         }
+
         body {
-            margin: 0;
-            font-family: 'Inter', sans-serif;
-            background: var(--bg);
+            font-family: var(--font-family);
+            background-color: var(--bg);
             color: var(--text);
-            padding: 1rem;
-            transition: background-color 0.3s, color 0.3s; /* Transición para modo oscuro */
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
         }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: var(--card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+        }
+
+        h1, h2 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 10px;
+            margin-top: 30px;
+        }
+
         .section {
-            background: var(--card);
-            border-radius: 1rem;
-            padding: 1rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-            transition: background-color 0.3s, box-shadow 0.3s;
+            margin-bottom: 25px;
+            padding: 15px;
+            background-color: var(--bg);
+            border-radius: 8px;
+            border: 1px solid var(--border);
         }
-        h1, h2, h3 {
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
             color: var(--primary);
         }
-        input[type="text"], select {
-            width: 100%;
-            padding: 0.6rem;
-            margin-bottom: 0.5rem;
-            border-radius: 0.6rem;
-            border: 1px solid var(--border); /* Uso de variable */
+
+        input[type="text"],
+        select {
+            width: calc(100% - 20px);
+            padding: 12px 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background-color: var(--input-bg);
+            color: var(--text);
+            font-family: var(--font-family);
             font-size: 1rem;
-            box-sizing: border-box;
-            background-color: var(--input-bg); /* Uso de variable */
-            color: var(--text); /* Uso de variable */
-            transition: border-color 0.3s, background-color 0.3s, color 0.3s;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        ul li {
-            background: #f1f1f1;
-            padding: 0.8rem;
-            margin-bottom: 0.5rem;
-            border-radius: 0.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        body.dark-mode ul li { /* Estilo para modo oscuro */
-            background: #3a3a5a;
-        }
-        ul li span[contenteditable="true"] {
-            flex-grow: 1;
-            margin-right: 0.5rem;
-            min-width: 150px;
-            padding: 0.2rem;
-            border: 1px solid transparent;
-            border-radius: 4px;
-        }
-        ul li span[contenteditable="true"]:focus {
-            border: 1px solid var(--primary);
-            background-color: #e6f0f5;
-        }
-        body.dark-mode ul li span[contenteditable="true"]:focus {
-            background-color: #4a4a7a;
-        }
-        .add-btn, .save-btn, .back-btn, .manage-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 0.6rem 1rem;
-            border-radius: 0.6rem;
-            cursor: pointer;
-            font-weight: bold;
-            margin-top: 1rem;
-            width: 100%;
-            transition: background-color 0.3s ease, filter 0.3s;
-        }
-        .delete-btn, .remove-day-btn {
-            background: var(--danger);
-            color: white;
-            border: none;
-            padding: 0.4rem 0.8rem;
-            border-radius: 0.4rem;
-            cursor: pointer;
-            font-weight: bold;
-            margin-left: 0.5rem;
-            transition: background-color 0.3s ease, filter 0.3s;
-        }
-        .add-btn:hover, .save-btn:hover, .manage-btn:hover {
-            background-color: #6a92b0;
-            filter: brightness(110%);
-        }
-        .delete-btn:hover, .remove-day-btn:hover {
-            background-color: #c82333;
-            filter: brightness(110%);
-        }
-        .back-btn {
-            background: var(--accent);
-            color: var(--text);
-            margin-top: 1.5rem;
-            border: 1px solid var(--primary);
-        }
-        .back-btn:hover {
-            background-color: #9ab6a8;
-            filter: brightness(110%);
-        }
-        .tab-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            margin-bottom: 1rem;
-            gap: 0.5rem;
-        }
-        .tab-buttons button {
-            flex-grow: 1;
-            padding: 0.8rem;
-            border: 1px solid var(--border); /* Uso de variable */
-            background: #eee;
-            cursor: pointer;
-            font-weight: bold;
-            border-radius: 0.6rem;
-            margin-bottom: 0;
-            min-width: 80px;
-            color: var(--text); /* Asegura que el texto sea legible en claro/oscuro */
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s;
-        }
-        body.dark-mode .tab-buttons button {
-            background: #2a2a40;
-            border-color: var(--border);
-            color: var(--text);
-        }
-        .tab-buttons button.active {
-            background: var(--primary);
-            color: white;
-        }
-        .tab-content {
-            border: 1px solid var(--border); /* Uso de variable */
-            padding: 1rem;
-            border-radius: 0.6rem;
             transition: border-color 0.3s;
         }
-        .day-header {
+
+        input[type="text"]:focus,
+        select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+            display: inline-block;
+            width: auto;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background-color: #6a95b5;
+        }
+
+        button.danger {
+            background-color: var(--danger);
+        }
+
+        button.danger:hover {
+            background-color: #c82333;
+        }
+
+        .button-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .day-section {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .day-card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            flex: 1 1 calc(50% - 15px); /* Dos columnas en pantallas grandes */
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            min-width: 280px; /* Ancho mínimo para evitar encogimiento excesivo */
+        }
+
+        .day-card h3 {
+            color: var(--accent);
+            margin-top: 0;
+            margin-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 5px;
+        }
+
+        .day-card ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 10px;
+        }
+
+        .day-card li {
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            padding: 8px 10px;
+            margin-bottom: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1rem;
+            font-size: 0.95em;
         }
-        .add-from-master {
+
+        .day-card li button {
+            padding: 5px 10px;
+            font-size: 0.85rem;
+            margin-left: 10px;
+            margin-bottom: 0;
+        }
+
+        .master-exercise-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+
+        .master-exercise-list li {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 8px;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
-        .add-from-master select {
-            flex-grow: 1;
-            margin-bottom: 0;
-        }
-        .add-from-master button {
-            width: auto;
-            padding: 0.6rem 1rem;
-            margin-top: 0;
-        }
-        .master-list ul {
-            max-height: 200px;
-            overflow-y: auto;
-            border: 1px solid var(--border); /* Uso de variable */
-            border-radius: 0.6rem;
-            padding: 0.5rem;
-            background-color: #f9f9f9;
-            transition: border-color 0.3s, background-color 0.3s;
-        }
-        body.dark-mode .master-list ul {
-            background-color: #2a2a40;
-        }
-        .master-list li {
-            background: none;
-            border-bottom: 1px dashed var(--border); /* Uso de variable */
-            margin-bottom: 0;
-            border-radius: 0;
-        }
-        .master-list li:last-child {
-            border-bottom: none;
-        }
-        .master-list li span {
-            flex-grow: 1;
-        }
-        .master-list input[type="text"] {
-            margin-top: 0.5rem;
-        }
-        .master-list-search {
-            margin-bottom: 1rem;
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+            .container {
+                padding: 15px;
+            }
+            button {
+                width: 100%;
+                margin-right: 0;
+            }
+            .button-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .day-card {
+                flex: 1 1 100%; /* Una columna en pantallas pequeñas */
+            }
         }
     </style>
 </head>
 <body>
-    <h1>✏️ Editar Plan Semanal</h1>
+    <div class="container">
+        <h1>Editar Plan Semanal</h1>
 
-    <div class="section">
-        <h2>🛠️ Gestión de Días de Entrenamiento</h2>
-        <div id="dayTabsContainer" class="tab-buttons">
+        <div class="section">
+            <h2>Plan de Entrenamiento por Días</h2>
+            <div class="day-selection-controls">
+                <label for="daySelect">Seleccionar Día:</label>
+                <select id="daySelect">
+                    <option value="day-1">Día 1 - Lunes</option>
+                    <option value="day-2">Día 2 - Martes</option>
+                    <option value="day-3">Día 3 - Miércoles</option>
+                    <option value="day-4">Día 4 - Jueves</option>
+                    <option value="day-5">Día 5 - Viernes</option>
+                    <option value="day-6">Día 6 - Sábado</option>
+                    <option value="day-7">Día 7 - Domingo</option>
+                </select>
+                <label for="dayNameInput">Nombre del Día:</label>
+                <input type="text" id="dayNameInput" placeholder="Ej. Día 1 - Full Body Fuerza">
+                <button id="saveDayNameBtn">Guardar Nombre del Día</button>
             </div>
 
-        <div id="dayContentsContainer">
+            <h3>Ejercicios para <span id="currentEditingDayName">Día 1 - Full Body Fuerza</span>:</h3>
+            <div class="form-group">
+                <label for="addExerciseToDaySelect">Añadir ejercicio al día:</label>
+                <select id="addExerciseToDaySelect">
+                    </select>
+                <button id="addExerciseToDayBtn">Añadir al Día</button>
             </div>
-
-        <input type="text" id="newDayName" placeholder="Ej: Día 4 - Brazos">
-        <button onclick="addDay()" class="add-btn">➕ Añadir Nuevo Día</button>
-    </div>
-
-    <div class="section">
-        <h2>📚 Listado Maestro de Ejercicios</h2>
-        <div class="master-list">
-            <input type="text" id="masterExerciseSearch" class="master-list-search" placeholder="Buscar ejercicio maestro..." onkeyup="filterMasterExercises()">
-            <ul id="masterExerciseList">
+            <ul id="dayExercisesList">
                 </ul>
-            <input type="text" id="newMasterExercise" placeholder="Añadir nuevo ejercicio maestro">
-            <button onclick="addMasterExercise()" class="add-btn">➕ Añadir a Listado Maestro</button>
-            <button onclick="confirmClearMasterList()" class="delete-btn" style="width: auto; margin-left: auto;">🗑️ Borrar Listado Maestro</button>
+        </div>
+
+        <div class="section">
+            <h2>Gestión de Ejercicios Maestros</h2>
+            <div class="form-group">
+                <label for="newMasterExercise">Nuevo Ejercicio Maestro:</label>
+                <input type="text" id="newMasterExercise" placeholder="Ej. Press Militar">
+                <button id="addMasterExerciseBtn">Añadir a Lista Maestra</button>
+            </div>
+            <h3>Lista Maestra de Ejercicios:</h3>
+            <ul id="masterExerciseList" class="master-exercise-list">
+                </ul>
+        </div>
+
+        <div class="button-group">
+            <button onclick="window.location.href='index.html'">Volver al Inicio</button>
         </div>
     </div>
 
-    <button onclick="window.location.href='index.html'" class="back-btn">⬅️ Volver a Mi Plan Fit</button>
-
     <script>
-        let planEntrenamiento = JSON.parse(localStorage.getItem("planEntrenamiento") || "{}");
-        let masterExercises = JSON.parse(localStorage.getItem("masterExercises") || "[]");
+        // --- Variables Globales ---
+        let planEntrenamiento = {}; // Almacena el plan de entrenamiento semanal
+        let masterExercises = []; // Lista maestra de todos los ejercicios disponibles
 
-        // --- Dark Mode Initialization for this page ---
-        if (localStorage.getItem('darkMode') === 'enabled') {
-            document.body.classList.add('dark-mode');
-        } else {
-            document.body.classList.remove('dark-mode');
-        }
+        // --- Selectores DOM ---
+        const daySelect = document.getElementById('daySelect');
+        const dayNameInput = document.getElementById('dayNameInput');
+        const saveDayNameBtn = document.getElementById('saveDayNameBtn');
+        const currentEditingDayName = document.getElementById('currentEditingDayName');
+        const addExerciseToDaySelect = document.getElementById('addExerciseToDaySelect');
+        const addExerciseToDayBtn = document.getElementById('addExerciseToDayBtn');
+        const dayExercisesList = document.getElementById('dayExercisesList');
+        const newMasterExerciseInput = document.getElementById('newMasterExercise');
+        const addMasterExerciseBtn = document.getElementById('addMasterExerciseBtn');
+        const masterExerciseList = document.getElementById('masterExerciseList');
 
-        // Funciones para gestionar el Listado Maestro de Ejercicios
-        function loadMasterExercises(filterText = '') {
-            const ul = document.getElementById("masterExerciseList");
-            ul.innerHTML = "";
-            const filteredExercises = masterExercises.filter(ej => 
-                ej.toLowerCase().includes(filterText.toLowerCase())
-            );
+        // --- Funciones de Utilidad ---
 
-            filteredExercises.forEach((ej, index) => {
-                // Hay que encontrar el índice original para las funciones de edición/borrado
-                const originalIndex = masterExercises.indexOf(ej); 
-                const li = document.createElement("li");
-                li.innerHTML = `
-                    <span contenteditable="true" onblur="updateMasterExercise(${originalIndex}, this.innerText)">${ej}</span>
-                    <button class="delete-btn" onclick="deleteMasterExercise(${originalIndex})">🗑</button>
-                `;
-                ul.appendChild(li);
-            });
-        }
-
-        function filterMasterExercises() {
-            const searchText = document.getElementById("masterExerciseSearch").value;
-            loadMasterExercises(searchText);
-        }
-
-        function addMasterExercise() {
-            const input = document.getElementById("newMasterExercise");
-            const newEj = input.value.trim();
-            if (newEj) {
-                if (!masterExercises.includes(newEj)) { // Evitar duplicados
-                    masterExercises.push(newEj);
-                    input.value = "";
-                    saveMasterExercises();
-                    loadMasterExercises();
-                } else {
-                    alert("Ese ejercicio ya existe en el listado maestro.");
-                }
-            }
-        }
-
-        function updateMasterExercise(index, newText) {
-            newText = newText.trim();
-            if (masterExercises[index] !== undefined) {
-                if (newText) {
-                    const isDuplicate = masterExercises.some((ej, i) => i !== index && ej === newText);
-                    if (isDuplicate) {
-                        alert("Ya existe un ejercicio con ese nombre.");
-                        loadMasterExercises();
-                    } else {
-                        masterExercises[index] = newText;
-                        saveMasterExercises();
-                        loadMasterExercises();
-                    }
-                } else {
-                    alert("El nombre del ejercicio no puede estar vacío. Borra la entrada si no la quieres.");
-                    loadMasterExercises();
-                }
-            }
-        }
-
-        function deleteMasterExercise(index) {
-            if (confirm(`¿Estás seguro de que quieres borrar "${masterExercises[index]}" del listado maestro?`)) {
-                masterExercises.splice(index, 1);
-                saveMasterExercises();
-                loadMasterExercises();
-            }
-        }
-
-        function saveMasterExercises() {
-            masterExercises = [...new Set(masterExercises)].sort((a, b) => a.localeCompare(b));
-            localStorage.setItem("masterExercises", JSON.stringify(masterExercises));
-        }
-
-        function confirmClearMasterList() {
-            if (confirm("¿Estás seguro de que quieres borrar TODO el listado maestro de ejercicios? Esta acción es irreversible.")) {
-                masterExercises = [];
-                saveMasterExercises();
-                loadMasterExercises();
-                alert("Listado maestro borrado.");
-            }
-        }
-
-        // Funciones para gestionar los Días de Entrenamiento
-        let activeDayId = null;
-
-        function generateDayId(name) {
-            return name.toLowerCase().replace(/\s/g, '-') + '-' + Date.now();
-        }
-
-        function loadDays() {
-            const dayTabsContainer = document.getElementById("dayTabsContainer");
-            const dayContentsContainer = document.getElementById("dayContentsContainer");
-            dayTabsContainer.innerHTML = "";
-            dayContentsContainer.innerHTML = "";
-
-            const dayKeys = Object.keys(planEntrenamiento).sort((a,b) => {
-                const numA = parseInt(a.match(/day-(\d+)/)?.[1]);
-                const numB = parseInt(b.match(/day-(\d+)/)?.[1]);
-                if (!isNaN(numA) && !isNaN(numB)) return numA - numB;
-                return a.localeCompare(b);
-            });
-
-            if (dayKeys.length === 0) {
-                dayContentsContainer.innerHTML = "<p>No hay días de entrenamiento. Añade uno para empezar.</p>";
-                activeDayId = null;
-                return;
-            }
-
-            dayKeys.forEach(dayId => {
-                const dayData = planEntrenamiento[dayId];
-
-                const button = document.createElement("button");
-                button.textContent = dayData.name;
-                button.id = `tab-${dayId}`;
-                button.onclick = () => showDay(dayId);
-                dayTabsContainer.appendChild(button);
-
-                const contentDiv = document.createElement("div");
-                contentDiv.id = `content-${dayId}`;
-                contentDiv.classList.add("tab-content");
-                contentDiv.style.display = 'none';
-
-                contentDiv.innerHTML = `
-                    <div class="day-header">
-                        <h3>${dayData.name}</h3>
-                        <button class="remove-day-btn" onclick="confirmRemoveDay('${dayId}', '${dayData.name}')">🗑️ Borrar Día</button>
-                    </div>
-                    <ul id="listaEjercicios-${dayId}"></ul>
-                    <div class="add-from-master">
-                        <select id="selectEjercicioMaster-${dayId}">
-                            <option value="">Selecciona del listado maestro...</option>
-                            ${masterExercises.map(ej => `<option value="${ej}">${ej}</option>`).join('')}
-                        </select>
-                        <button onclick="addEjercicioFromMaster('${dayId}')" class="add-btn" style="width: auto;">➕</button>
-                    </div>
-                    <input type="text" id="nuevoEjercicio-${dayId}" placeholder="Añadir nuevo ejercicio manual">
-                    <button onclick="addEjercicio('${dayId}')" class="add-btn">➕ Añadir Ejercicio Manual</button>
-                    <button onclick="saveDayChanges('${dayId}')" class="save-btn">💾 Guardar Cambios para ${dayData.name}</button>
-                `;
-                dayContentsContainer.appendChild(contentDiv);
-            });
-
-            if (!activeDayId || !planEntrenamiento[activeDayId]) {
-                activeDayId = dayKeys[0];
-            }
-            showDay(activeDayId);
-        }
-
-        function showDay(dayId) {
-            if (activeDayId && document.getElementById(`content-${activeDayId}`)) {
-                document.getElementById(`content-${activeDayId}`).style.display = 'none';
-                document.getElementById(`tab-${activeDayId}`).classList.remove('active');
-            }
-
-            activeDayId = dayId;
-
-            document.getElementById(`content-${activeDayId}`).style.display = 'block';
-            document.getElementById(`tab-${activeDayId}`).classList.add('active');
-
-            loadEjerciciosForDay(activeDayId);
-        }
-
-        function addDay() {
-            const newDayNameInput = document.getElementById("newDayName");
-            let newDayName = newDayNameInput.value.trim();
-
-            if (!newDayName) {
-                alert("Por favor, introduce un nombre para el nuevo día.");
-                return;
-            }
-
-            let dayId;
-            const existingDayNumbers = Object.keys(planEntrenamiento)
-                                        .map(id => parseInt(id.match(/day-(\d+)/)?.[1]))
-                                        .filter(num => !isNaN(num));
-            const nextDayNumber = existingDayNumbers.length > 0 ? Math.max(...existingDayNumbers) + 1 : 1;
-
-            if (newDayName.toLowerCase().startsWith("día") || newDayName.toLowerCase().startsWith("dia")) {
-                 dayId = `day-${nextDayNumber}`;
-                 if (!newDayName.toLowerCase().includes(nextDayNumber.toString())) {
-                    newDayName = `Día ${nextDayNumber}`;
-                 }
-            } else {
-                dayId = generateDayId(newDayName);
-            }
-            
-            const nameExists = Object.values(planEntrenamiento).some(day => day.name === newDayName);
-            if (nameExists) {
-                alert(`Ya existe un día con el nombre "${newDayName}". Por favor, elige otro nombre.`);
-                return;
-            }
-
-            planEntrenamiento[dayId] = {
-                name: newDayName,
-                ejercicios: []
-            };
-            savePlan();
-            newDayNameInput.value = "";
-            loadDays();
-            showDay(dayId);
-        }
-
-        function confirmRemoveDay(dayId, dayName) {
-            if (confirm(`¿Estás seguro de que quieres borrar el día "${dayName}" y todos sus ejercicios? Esta acción es irreversible.`)) {
-                removeDay(dayId);
-            }
-        }
-
-        function removeDay(dayId) {
-            delete planEntrenamiento[dayId];
-            savePlan();
-            loadDays();
-
-            const dayKeys = Object.keys(planEntrenamiento);
-            if (dayKeys.length > 0) {
-                showDay(dayKeys[0]);
-            } else {
-                document.getElementById("dayContentsContainer").innerHTML = "<p>No hay días de entrenamiento. Añade uno para empezar.</p>";
-                activeDayId = null;
-            }
-        }
-
-        function loadEjerciciosForDay(dayId) {
-            const ul = document.getElementById(`listaEjercicios-${dayId}`);
-            if (!ul) return;
-            ul.innerHTML = "";
-            const currentEjercicios = planEntrenamiento[dayId] ? planEntrenamiento[dayId].ejercicios : [];
-
-            currentEjercicios.forEach((ej, index) => {
-                const li = document.createElement("li");
-                li.innerHTML = `
-                    <span contenteditable="true" onblur="updateEjercicioForDay('${dayId}', ${index}, this.innerText)">${ej}</span>
-                    <button class="delete-btn" onclick="deleteEjercicioForDay('${dayId}', ${index})">🗑</button>
-                `;
-                ul.appendChild(li);
-            });
-        }
-
-        function addEjercicio(dayId) {
-            const input = document.getElementById(`nuevoEjercicio-${dayId}`);
-            const newEj = input.value.trim();
-            if (newEj) {
-                if (!planEntrenamiento[dayId]) {
-                    planEntrenamiento[dayId] = { name: "Nuevo Día", ejercicios: [] };
-                }
-                planEntrenamiento[dayId].ejercicios.push(newEj);
-                input.value = "";
-                loadEjerciciosForDay(dayId);
-                savePlan();
-            }
-        }
-
-        function addEjercicioFromMaster(dayId) {
-            const select = document.getElementById(`selectEjercicioMaster-${dayId}`);
-            const selectedExercise = select.value;
-            if (selectedExercise) {
-                if (!planEntrenamiento[dayId]) {
-                    planEntrenamiento[dayId] = { name: "Nuevo Día", ejercicios: [] };
-                }
-                if (!planEntrenamiento[dayId].ejercicios.includes(selectedExercise)) {
-                    planEntrenamiento[dayId].ejercicios.push(selectedExercise);
-                    loadEjerciciosForDay(dayId);
-                    savePlan();
-                } else {
-                    alert("Este ejercicio ya está en la lista de este día.");
-                }
-                select.value = "";
-            } else {
-                alert("Por favor, selecciona un ejercicio del listado maestro.");
-            }
-        }
-
-        function updateEjercicioForDay(dayId, index, newText) {
-            newText = newText.trim();
-            if (planEntrenamiento[dayId] && planEntrenamiento[dayId].ejercicios[index] !== undefined) {
-                if (newText) {
-                    planEntrenamiento[dayId].ejercicios[index] = newText;
-                } else {
-                    alert("El nombre del ejercicio no puede estar vacío. Bórralo si no lo necesitas.");
-                    loadEjerciciosForDay(dayId);
-                }
-                savePlan();
-            }
-        }
-
-        function deleteEjercicioForDay(dayId, index) {
-            if (confirm(`¿Estás seguro de que quieres borrar "${planEntrenamiento[dayId].ejercicios[index]}" de este día?`)) {
-                planEntrenamiento[dayId].ejercicios.splice(index, 1);
-                loadEjerciciosForDay(dayId);
-                savePlan();
-            }
-        }
-
-        function saveDayChanges(dayId) {
-            savePlan();
-            alert(`Cambios para ${planEntrenamiento[dayId].name} guardados.`);
-        }
-
+        // Guardar plan de entrenamiento en localStorage
         function savePlan() {
             localStorage.setItem("planEntrenamiento", JSON.stringify(planEntrenamiento));
+            console.log("Plan de entrenamiento guardado:", planEntrenamiento);
         }
 
-        // Inicialización
-        document.addEventListener('DOMContentLoaded', () => {
-            // Valores por defecto si no existe ningún día
+        // Guardar lista maestra de ejercicios en localStorage
+        function saveMasterExercises() {
+            localStorage.setItem("master_exercises", JSON.stringify(masterExercises));
+            console.log("Ejercicios maestros guardados:", masterExercises);
+        }
+
+        // Aplicar modo oscuro al cargar
+        function applyDarkMode() {
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+            }
+        }
+
+        // --- Funciones para la Edición del Plan Semanal ---
+
+        // Cargar el plan de entrenamiento y ejercicios maestros
+        function loadData() {
+            planEntrenamiento = JSON.parse(localStorage.getItem("planEntrenamiento") || "{}");
+            masterExercises = JSON.parse(localStorage.getItem("master_exercises") || "[]");
+
+            // Valores por defecto para el plan de entrenamiento si no existe
             if (Object.keys(planEntrenamiento).length === 0) {
                 planEntrenamiento['day-1'] = { name: "Día 1 - Full Body Fuerza", ejercicios: ["Peso muerto rumano", "Dominadas asistidas", "Press inclinado", "Plancha", "Bird-dogs"] };
                 planEntrenamiento['day-2'] = { name: "Día 2 - Hipertrofia + Core", ejercicios: ["Sentadilla goblet", "Remo con barra", "Z-Press", "Plancha reach", "Hollow hold"] };
                 planEntrenamiento['day-3'] = { name: "Día 3 - Cardio + Core", ejercicios: ["Caminata inclinada", "2 abdominales a elección", "Movilidad 10 min"] };
+                planEntrenamiento['day-4'] = { name: "Día 4 - Descanso", ejercicios: [] };
+                planEntrenamiento['day-5'] = { name: "Día 5 - Tren Superior", ejercicios: ["Press de hombros", "Remo con mancuernas", "Flexiones"] };
+                planEntrenamiento['day-6'] = { name: "Día 6 - Tren Inferior", ejercicios: ["Sentadilla", "Peso muerto", "Zancadas"] };
+                planEntrenamiento['day-7'] = { name: "Día 7 - Actividad Ligera", ejercicios: ["Yoga", "Caminata"] };
                 savePlan();
             }
 
-            // Valores por defecto para el listado maestro si no existe
+            // Valores por defecto para el listado maestro si no existe o está vacío
             if (masterExercises.length === 0) {
                 masterExercises = [
                     "Sentadilla", "Peso Muerto", "Press Banca", "Press Militar", "Remo con Barra",
@@ -578,12 +342,151 @@
                     "Curl Femoral", "Elevaciones Laterales", "Pájaros", "Face Pull", "Plancha",
                     "Crunch", "Elevación de Piernas", "Hollow Hold", "Bird-dog", "Caminata Inclinada",
                     "Burpees", "Saltos de Caja", "Sentadilla Búlgara", "Hip Thrust", "Press Francés"
-                ];
+                ].sort(); // Asegurarse de que esté ordenado
                 saveMasterExercises();
             }
+        }
 
-            loadMasterExercises();
-            loadDays();
+        // Rellenar el selector de ejercicios maestros
+        function populateMasterExerciseSelect() {
+            addExerciseToDaySelect.innerHTML = '';
+            masterExercises.forEach(exercise => {
+                const option = document.createElement('option');
+                option.value = exercise;
+                option.textContent = exercise;
+                addExerciseToDaySelect.appendChild(option);
+            });
+        }
+
+        // Mostrar los ejercicios del día seleccionado
+        function displayDayExercises() {
+            const selectedDayKey = daySelect.value;
+            const dayPlan = planEntrenamiento[selectedDayKey];
+
+            currentEditingDayName.textContent = dayPlan ? dayPlan.name : `Día ${selectedDayKey.split('-')[1]}`;
+            dayNameInput.value = dayPlan ? dayPlan.name : '';
+
+            dayExercisesList.innerHTML = ''; // Limpiar lista
+            if (dayPlan && dayPlan.ejercicios && dayPlan.ejercicios.length > 0) {
+                dayPlan.ejercicios.forEach((exercise, index) => {
+                    const li = document.createElement('li');
+                    li.textContent = exercise;
+                    const deleteBtn = document.createElement('button');
+                    deleteBtn.textContent = 'Eliminar';
+                    deleteBtn.classList.add('danger');
+                    deleteBtn.onclick = () => removeExerciseFromDay(selectedDayKey, index);
+                    li.appendChild(deleteBtn);
+                    dayExercisesList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = 'No hay ejercicios para este día. Añade algunos desde la lista maestra.';
+                dayExercisesList.appendChild(li);
+            }
+        }
+
+        // Añadir ejercicio al día seleccionado
+        addExerciseToDayBtn.addEventListener('click', () => {
+            const selectedDayKey = daySelect.value;
+            const exerciseToAdd = addExerciseToDaySelect.value;
+
+            if (exerciseToAdd && planEntrenamiento[selectedDayKey]) {
+                if (!planEntrenamiento[selectedDayKey].ejercicios) {
+                    planEntrenamiento[selectedDayKey].ejercicios = [];
+                }
+                if (!planEntrenamiento[selectedDayKey].ejercicios.includes(exerciseToAdd)) {
+                    planEntrenamiento[selectedDayKey].ejercicios.push(exerciseToAdd);
+                    savePlan();
+                    displayDayExercises();
+                } else {
+                    alert("Este ejercicio ya está en el día.");
+                }
+            } else if (!exerciseToAdd) {
+                alert("Por favor, selecciona un ejercicio de la lista maestra para añadir.");
+            }
+        });
+
+        // Eliminar ejercicio de un día
+        function removeExerciseFromDay(dayKey, index) {
+            if (planEntrenamiento[dayKey] && planEntrenamiento[dayKey].ejercicios) {
+                planEntrenamiento[dayKey].ejercicios.splice(index, 1);
+                savePlan();
+                displayDayExercises();
+            }
+        }
+
+        // Manejar cambio de día en el selector
+        daySelect.addEventListener('change', displayDayExercises);
+
+        // Guardar el nombre del día
+        saveDayNameBtn.addEventListener('click', () => {
+            const selectedDayKey = daySelect.value;
+            const newName = dayNameInput.value.trim();
+            if (newName) {
+                if (!planEntrenamiento[selectedDayKey]) {
+                    planEntrenamiento[selectedDayKey] = { ejercicios: [] }; // Asegurarse de que el objeto del día exista
+                }
+                planEntrenamiento[selectedDayKey].name = newName;
+                savePlan();
+                currentEditingDayName.textContent = newName; // Actualizar el display
+                alert("Nombre del día guardado.");
+            } else {
+                alert("El nombre del día no puede estar vacío.");
+            }
+        });
+
+
+        // --- Funciones para la Gestión de Ejercicios Maestros ---
+
+        // Mostrar la lista maestra de ejercicios
+        function displayMasterExercises() {
+            masterExerciseList.innerHTML = '';
+            masterExercises.forEach((exercise, index) => {
+                const li = document.createElement('li');
+                li.textContent = exercise;
+                const deleteBtn = document.createElement('button');
+                deleteBtn.textContent = 'Eliminar';
+                deleteBtn.classList.add('danger');
+                deleteBtn.onclick = () => removeMasterExercise(index);
+                li.appendChild(deleteBtn);
+                masterExerciseList.appendChild(li);
+            });
+        }
+
+        // Añadir nuevo ejercicio a la lista maestra
+        addMasterExerciseBtn.addEventListener('click', () => {
+            const newExercise = newMasterExerciseInput.value.trim();
+            if (newExercise && !masterExercises.includes(newExercise)) {
+                masterExercises.push(newExercise);
+                masterExercises.sort(); // Mantener la lista ordenada
+                saveMasterExercises();
+                displayMasterExercises();
+                populateMasterExerciseSelect(); // Actualizar el select de añadir al día
+                newMasterExerciseInput.value = ''; // Limpiar el input
+            } else if (!newExercise) {
+                alert("El nombre del ejercicio no puede estar vacío.");
+            } else {
+                alert("Este ejercicio ya existe en la lista maestra.");
+            }
+        });
+
+        // Eliminar ejercicio de la lista maestra
+        function removeMasterExercise(index) {
+            if (confirm(`¿Estás seguro de que quieres eliminar "${masterExercises[index]}" de la lista maestra?`)) {
+                masterExercises.splice(index, 1);
+                saveMasterExercises();
+                displayMasterExercises();
+                populateMasterExerciseSelect(); // Actualizar el select de añadir al día
+            }
+        }
+
+        // --- Inicialización al Cargar la Página ---
+        document.addEventListener('DOMContentLoaded', () => {
+            applyDarkMode();
+            loadData(); // Cargar plan y ejercicios maestros
+            populateMasterExerciseSelect(); // Rellenar el select de añadir ejercicios
+            displayMasterExercises(); // Mostrar la lista maestra
+            displayDayExercises(); // Mostrar los ejercicios del primer día por defecto
         });
     </script>
 </body>
