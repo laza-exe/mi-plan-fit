@@ -24,6 +24,7 @@
       --border: #e0e0e0;
       --input-bg: #ffffff;
       --button-secondary-text: var(--text);
+      --header-bg: #f0f0f0; /* Color de fondo para el encabezado */
     }
     
     /* Dark Mode */
@@ -38,6 +39,7 @@
       --border: #44445c;
       --input-bg: #2a2a40;
       --button-secondary-text: #e0e0e0;
+      --header-bg: #2a2a40; /* Color de fondo para el encabezado en modo oscuro */
     }
 
     body {
@@ -46,6 +48,7 @@
       background: var(--bg);
       color: var(--text);
       padding: 1rem;
+      padding-top: 70px; /* Ajuste para el menú fijo */
       transition: background-color 0.3s, color 0.3s;
     }
     h1, h2, h3 {
@@ -209,11 +212,6 @@
     }
 
     /* Estilos para el toggle de modo oscuro */
-    .dark-mode-toggle {
-        display: flex;
-        justify-content: flex-end;
-        margin-bottom: 1rem;
-    }
     .switch {
       position: relative;
       display: inline-block;
@@ -260,34 +258,126 @@
       -ms-transform: translateX(20px);
       transform: translateX(20px);
     }
-    .dark-mode-toggle label {
-        margin-bottom: 0;
+    .dark-mode-label {
         margin-right: 0.5rem;
         display: flex;
         align-items: center;
         font-weight: normal;
+        font-size: 0.9rem;
+    }
+    /* Responsive table container */
+    .table-container {
+        overflow-x: auto; /* Allows horizontal scrolling for the table */
+        margin-bottom: 1rem;
     }
 
-    /* NUEVOS ESTILOS PARA EL CONTENEDOR DEL GRÁFICO DE PESO */
-    .chart-container {
-        position: relative; /* Necesario para que el canvas se ajuste al contenedor */
-        height: 300px; /* Altura fija para el gráfico */
-        max-height: 50vh; /* Altura máxima relativa al viewport */
-        width: 100%; /* Ocupa todo el ancho disponible */
-        margin-bottom: 20px; /* Espacio debajo del gráfico */
+    /* Fixed Header/Menu Styles */
+    .fixed-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        background-color: var(--header-bg);
+        color: var(--text);
+        padding: 0.5rem 1rem;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 1000;
+        box-sizing: border-box;
+        transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
     }
+    .fixed-header h1 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: var(--primary);
+    }
+    .menu-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    /* Dropdown for data management */
+    .dropdown {
+        position: relative;
+        display: inline-block;
+    }
+    .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: var(--card);
+        min-width: 200px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        right: 0; /* Align to the right */
+        border-radius: 0.6rem;
+        overflow: hidden;
+        transition: background-color 0.3s;
+    }
+    .dropdown-content a {
+        color: var(--text);
+        padding: 10px 16px;
+        text-decoration: none;
+        display: block;
+        font-size: 0.95rem;
+        transition: background-color 0.2s, color 0.2s;
+    }
+    .dropdown-content a:hover {
+        background-color: var(--border);
+    }
+    .dropdown:hover .dropdown-content {
+        display: block;
+    }
+    .dropbtn {
+        background-color: var(--primary);
+        color: white;
+        padding: 10px 15px;
+        font-size: 1rem;
+        border: none;
+        cursor: pointer;
+        border-radius: 0.6rem;
+    }
+    .dropbtn:hover {
+        background-color: #6a92b0;
+    }
+    /* Specific styling for dangerous actions in dropdown */
+    .dropdown-content .danger-option {
+        color: var(--danger);
+    }
+    .dropdown-content .danger-option:hover {
+        background-color: rgba(var(--danger), 0.1); /* Ligero fondo rojo al pasar el ratón */
+    }
+
   </style>
 </head>
 <body>
-  <div class="dark-mode-toggle">
-    <label for="darkModeToggle">Modo Oscuro</label>
-    <label class="switch">
-      <input type="checkbox" id="darkModeToggle">
-      <span class="slider round"></span>
-    </label>
+  <div class="fixed-header">
+    <h1>Mi Plan Fit 📱</h1>
+    <div class="menu-right">
+      <label class="dark-mode-label" for="darkModeToggle">Modo Oscuro</label>
+      <label class="switch">
+        <input type="checkbox" id="darkModeToggle">
+        <span class="slider round"></span>
+      </label>
+
+      <div class="dropdown">
+        <button class="dropbtn">☰ Opciones</button>
+        <div class="dropdown-content">
+            <a href="#" onclick="confirmClearPeso(); hideDropdown(this);">🗑️ Borrar Historial Peso</a>
+            <a href="#" onclick="confirmClearCurrentEjercicios(); hideDropdown(this);">🗑️ Borrar Ejercicios Tabla Actual</a>
+            <a href="#" onclick="confirmClearAllExerciseHistory(); hideDropdown(this);">🗑️ Borrar Todo Historial Ejercicios</a>
+            <hr style="border-color: var(--border);">
+            <a href="#" onclick="exportData(); hideDropdown(this);">⬆️ Exportar Datos</a>
+            <a href="#" onclick="document.getElementById('importFileInput').click(); hideDropdown(this);">⬇️ Importar Datos</a>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <h1>Mi Plan Fit 📱</h1>
+  <input type="file" id="importFileInput" style="display: none;" accept=".json">
+
 
   <div class="section">
     <h2>✅ Calendario Semanal</h2>
@@ -317,15 +407,12 @@
         </tbody>
     </table>
     
-    <button class="small-btn button-danger" onclick="confirmClearPeso()" style="display: block; margin: 0 auto;">Borrar Historial Completo</button>
   </div>
 
   <div class="section">
     <h2>📊 Gráficos de Progreso</h2>
     <h3>Evolución del Peso</h3>
-    <div class="chart-container">
-        <canvas id="weightChart"></canvas>
-    </div>
+    <canvas id="weightChart"></canvas>
 
     <h3 style="margin-top: 1.5rem;">Progreso de Ejercicio Específico</h3>
     <select id="exerciseChartSelect" onchange="updateExerciseChart()">
@@ -346,12 +433,13 @@
   <div class="section">
     <h2>🏋️ Carga de Ejercicios</h2>
     <p>Rellena esta tabla con tu sesión de hoy. Al guardar, se añadirá al historial.</p>
-    <table id="tablaEjercicios">
-      <thead>
-        <tr><th>Ejercicio</th><th>Series</th><th>Peso (kg)</th><th>Notas</th><th>RPE</th><th>Acciones</th></tr>
-      </thead>
-      <tbody></tbody>
-    </table>
+    <div class="table-container"> <table id="tablaEjercicios">
+          <thead>
+            <tr><th>Ejercicio</th><th>Series</th><th>Peso (kg)</th><th>Notas</th><th>Acciones</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+    </div>
     <button onclick="addFila()">➕ Añadir Ejercicio Manualmente</button>
 
     <div class="add-from-calendar">
@@ -373,7 +461,6 @@
     <button onclick="guardarEjerciciosSesion()">💾 Guardar Sesión de Hoy</button>
     <div id="ejerciciosMessage" class="message" style="display: none;"></div>
     
-    <button class="button-danger" onclick="confirmClearCurrentEjercicios()">🗑️ Borrar Ejercicios Actuales de la Tabla</button>
   </div>
 
   <div class="section">
@@ -383,18 +470,7 @@
     
     <div id="exerciseHistoryDisplay">
         </div>
-    <button class="button-danger" onclick="confirmClearAllExerciseHistory()">🗑️ Borrar Todo el Historial de Ejercicios</button>
   </div>
-
-  <div class="section">
-    <h2>📂 Gestión de Datos</h2>
-    <button onclick="exportData()" class="button-secondary">Exportar Todos los Datos</button>
-    <input type="file" id="importFileInput" style="display: none;" accept=".json">
-    <button onclick="document.getElementById('importFileInput').click()" class="button-secondary" style="margin-top: 1rem;">Importar Datos</button>
-    <p style="font-size: 0.9rem; margin-top: 0;">* Importar sobrescribirá los datos existentes. ¡Úsalo con precaución!</p>
-    <div id="dataMessage" class="message" style="display: none;"></div>
-  </div>
-
 
 <script>
   // --- Global Variables and Setup ---
@@ -426,6 +502,9 @@
       document.body.classList.remove('dark-mode');
       localStorage.setItem('darkMode', 'disabled');
     }
+    // Re-render charts to apply new colors
+    updateWeightChart();
+    updateExerciseChart();
   }
 
   // Check user preference on load
@@ -526,7 +605,6 @@
     pesoMessage.className = "message success";
     pesoMessage.style.display = "block";
     setTimeout(() => { pesoMessage.style.display = "none"; }, 3000);
-    
     displayPesoHistory();
     updateWeightChart(); // Actualizar el gráfico
   }
@@ -534,61 +612,62 @@
   function displayPesoHistory() {
     const tbody = document.querySelector("#pesoHistoryTable tbody");
     tbody.innerHTML = "";
-    
     const groupedPesos = pesos.reduce((acc, entry) => {
-        if (!acc[entry.fecha]) { acc[entry.fecha] = []; }
-        acc[entry.fecha].push(entry);
-        return acc;
+      if (!acc[entry.fecha]) {
+        acc[entry.fecha] = [];
+      }
+      acc[entry.fecha].push(entry);
+      return acc;
     }, {});
 
     const sortedDates = Object.keys(groupedPesos).sort((a, b) => {
-        const [dayA, monthA, yearA] = a.split('/');
-        const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
-        const [dayB, monthB, yearB] = b.split('/');
-        const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
-        return dateB - dateA;
+      const [dayA, monthA, yearA] = a.split('/');
+      const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
+      const [dayB, monthB, yearB] = b.split('/');
+      const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
+      return dateB - dateA;
     });
 
     sortedDates.forEach(date => {
-        const dateRow = document.createElement("tr");
-        dateRow.innerHTML = `<td colspan="3" class="date-header">${date}</td>`;
-        tbody.appendChild(dateRow);
+      const dateRow = document.createElement("tr");
+      dateRow.innerHTML = `<td colspan="3" class="date-header">${date}</td>`;
+      tbody.appendChild(dateRow);
 
-        groupedPesos[date].sort((a,b) => {
-            const [ha, ma] = a.hora.split(':').map(Number);
-            const [hb, mb] = b.hora.split(':').map(Number);
-            if (ha !== hb) return ha - hb;
-            return ma - mb;
-        });
+      groupedPesos[date].sort((a,b) => {
+        const [ha, ma] = a.hora.split(':').map(Number);
+        const [hb, mb] = b.hora.split(':').map(Number);
+        if (ha !== hb) return ha - hb;
+        return ma - mb;
+      });
 
-        groupedPesos[date].forEach((entry, index) => {
-            const row = document.createElement("tr");
-            row.innerHTML = `
-                <td></td>
-                <td>${entry.peso} kg (${entry.hora})</td>
-                <td>
-                    <button class="small-btn button-danger" onclick="deletePesoEntry('${entry.fecha}', '${entry.hora}')">🗑</button>
-                </td>
-            `;
-            tbody.appendChild(row);
-        });
+      groupedPesos[date].forEach((entry, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td></td>
+          <td>${entry.peso} kg (${entry.hora})</td>
+          <td>
+            <button class="small-btn button-danger" onclick="deletePesoEntry('${entry.fecha}', '${entry.hora}')">🗑</button>
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
     });
 
     if (pesos.length === 0) {
-        const noDataRow = document.createElement("tr");
-        noDataRow.innerHTML = `<td colspan="3">No hay historial de peso.</td>`;
-        tbody.appendChild(noDataRow);
+      const noDataRow = document.createElement("tr");
+      noDataRow.innerHTML = `<td colspan="3">No hay historial de peso.</td>`;
+      tbody.appendChild(noDataRow);
     }
   }
 
   function deletePesoEntry(dateToDelete, timeToDelete) {
-      if (confirm(`¿Estás seguro de que quieres borrar la entrada de peso de ${dateToDelete} a las ${timeToDelete}?`)) {
-          pesos = pesos.filter(entry => !(entry.fecha === dateToDelete && entry.hora === timeToDelete));
-          localStorage.setItem("peso_historial", JSON.stringify(pesos));
-          displayPesoHistory();
-          updateWeightChart(); // Actualizar el gráfico
-          alert("Entrada de peso borrada.");
-      }
+    if (confirm(`¿Estás seguro de que quieres borrar la entrada de peso de ${dateToDelete} a las ${timeToDelete}?`)) {
+      pesos = pesos.filter(entry => !(entry.fecha === dateToDelete && entry.hora === timeToDelete));
+      localStorage.setItem("peso_historial", JSON.stringify(pesos));
+      displayPesoHistory();
+      updateWeightChart(); // Actualizar el gráfico
+      alert("Entrada de peso borrada.");
+    }
   }
 
   function confirmClearPeso() {
@@ -608,323 +687,324 @@
 
   // --- Gráficos de Progreso ---
   function updateWeightChart() {
-      const ctx = document.getElementById('weightChart').getContext('2d');
-      if (weightChartInstance) {
-          weightChartInstance.destroy(); // Destruir la instancia anterior si existe
+    const ctx = document.getElementById('weightChart').getContext('2d');
+    if (weightChartInstance) {
+      weightChartInstance.destroy(); // Destruir la instancia anterior si existe
+    }
+
+    // Ordenar los pesos por fecha para el gráfico
+    const sortedPesos = [...pesos].sort((a, b) => {
+      const [dayA, monthA, yearA] = a.fecha.split('/');
+      const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
+      const [dayB, monthB, yearB] = b.fecha.split('/');
+      const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
+      // Si las fechas son iguales, ordenar por hora
+      if (dateA.getTime() === dateB.getTime()) {
+          const [hA, mA] = a.hora.split(':').map(Number);
+          const [hB, mB] = b.hora.split(':').map(Number);
+          return (hA * 60 + mA) - (hB * 60 + mB);
       }
+      return dateA - dateB;
+    });
 
-      // Ordenar los pesos por fecha para el gráfico
-      const sortedPesos = [...pesos].sort((a, b) => {
-          const [dayA, monthA, yearA] = a.fecha.split('/');
-          const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
-          const [dayB, monthB, yearB] = b.fecha.split('/');
-          const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
-          // Si las fechas son iguales, ordenar por hora
-          if (dateA.getTime() === dateB.getTime()) {
-              const [hA, mA] = a.hora.split(':').map(Number);
-              const [hB, mB] = b.hora.split(':').map(Number);
-              return (hA * 60 + mA) - (hB * 60 + mB);
-          }
-          return dateA - dateB;
-      });
+    const labels = sortedPesos.map(entry => `${entry.fecha} (${entry.hora})`);
+    const data = sortedPesos.map(entry => entry.peso);
 
-      const labels = sortedPesos.map(entry => `${entry.fecha} (${entry.hora})`);
-      const data = sortedPesos.map(entry => entry.peso);
+    // Get computed styles for chart colors
+    const computedStyle = getComputedStyle(document.documentElement);
+    const textColor = computedStyle.getPropertyValue('--text').trim();
+    const borderColor = computedStyle.getPropertyValue('--primary').trim();
+    const gridColor = computedStyle.getPropertyValue('--border').trim();
 
-      weightChartInstance = new Chart(ctx, {
-          type: 'line',
-          data: {
-              labels: labels,
-              datasets: [{
-                  label: 'Peso (kg)',
-                  data: data,
-                  borderColor: getComputedStyle(document.documentElement).getPropertyValue('--primary').trim(),
-                  borderWidth: 2,
-                  fill: false,
-                  tension: 0.1
-              }]
+    weightChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: 'Peso (kg)',
+          data: data,
+          borderColor: borderColor,
+          borderWidth: 2,
+          fill: false,
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: false,
+            title: {
+              display: true,
+              text: 'Peso (kg)',
+              color: textColor
+            },
+            ticks: {
+              color: textColor
+            },
+            grid: {
+              color: gridColor
+            }
           },
-          options: {
-              responsive: true,
-              maintainAspectRatio: false, // ¡IMPORTANTE para que el CSS controle la altura!
-              scales: {
-                  y: {
-                      beginAtZero: false,
-                      title: {
-                          display: true,
-                          text: 'Peso (kg)',
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--text').trim()
-                      },
-                      ticks: {
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--text').trim()
-                      },
-                      grid: {
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--border').trim()
-                      },
-                      // ¡AÑADIDO PARA FIJAR EL RANGO DEL EJE Y!
-                      min: 50, 
-                      max: 150 
-                  },
-                  x: {
-                      title: {
-                          display: true,
-                          text: 'Fecha y Hora',
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--text').trim()
-                      },
-                      ticks: {
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--text').trim()
-                      },
-                      grid: {
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--border').trim()
-                      }
-                  }
-              },
-              plugins: {
-                  legend: {
-                      labels: {
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--text').trim()
-                      }
-                  }
-              }
+          x: {
+            title: {
+              display: true,
+              text: 'Fecha y Hora',
+              color: textColor
+            },
+            ticks: {
+              color: textColor
+            },
+            grid: {
+              color: gridColor
+            }
           }
-      });
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: textColor
+            }
+          }
+        }
+      }
+    });
   }
 
   let exerciseChartInstance = null; // Para la instancia del gráfico de ejercicio
 
   function populateExerciseChartDropdown() {
-      const select = document.getElementById("exerciseChartSelect");
-      select.innerHTML = '<option value="">Selecciona un ejercicio...</option>';
-      const allExerciseNames = new Set(); // Usar un Set para evitar duplicados
-
-      ejerciciosSesiones.forEach(session => {
-          session.ejercicios.forEach(ej => {
-              allExerciseNames.add(ej.nombre);
-          });
+    const select = document.getElementById("exerciseChartSelect");
+    select.innerHTML = '<option value="">Selecciona un ejercicio...</option>';
+    const allExerciseNames = new Set(); // Usar un Set para evitar duplicados
+    ejerciciosSesiones.forEach(session => {
+      session.ejercicios.forEach(ej => {
+        allExerciseNames.add(ej.nombre);
       });
-
-      const sortedExerciseNames = Array.from(allExerciseNames).sort();
-
-      sortedExerciseNames.forEach(name => {
-          const option = document.createElement("option");
-          option.value = name;
-          option.textContent = name;
-          select.appendChild(option);
-      });
+    });
+    const sortedExerciseNames = Array.from(allExerciseNames).sort();
+    sortedExerciseNames.forEach(name => {
+      const option = document.createElement("option");
+      option.value = name;
+      option.textContent = name;
+      select.appendChild(option);
+    });
   }
 
   function updateExerciseChart() {
-      const selectedExerciseName = document.getElementById("exerciseChartSelect").value;
-      const ctx = document.getElementById('exerciseChart').getContext('2d');
+    const selectedExerciseName = document.getElementById("exerciseChartSelect").value;
+    const ctx = document.getElementById('exerciseChart').getContext('2d');
+    if (exerciseChartInstance) {
+      exerciseChartInstance.destroy();
+    }
+    if (!selectedExerciseName) {
+      return; // No hacer nada si no hay ejercicio seleccionado
+    }
 
-      if (exerciseChartInstance) {
-          exerciseChartInstance.destroy();
-      }
-
-      if (!selectedExerciseName) {
-          return; // No hacer nada si no hay ejercicio seleccionado
-      }
-
-      // Filtrar datos para el ejercicio seleccionado
-      const exerciseDataPoints = [];
-      ejerciciosSesiones.forEach(session => {
-          const date = session.fecha;
-          session.ejercicios.forEach(ej => {
-              if (ej.nombre === selectedExerciseName) {
-                  // Intentar parsear el peso, manejar si no es un número
-                  const pesoValue = parseFloat(ej.peso);
-                  if (!isNaN(pesoValue)) {
-                      exerciseDataPoints.push({
-                          date: date,
-                          peso: pesoValue
-                      });
-                  }
-              }
-          });
+    // Filtrar datos para el ejercicio seleccionado
+    const exerciseDataPoints = [];
+    ejerciciosSesiones.forEach(session => {
+      const date = session.fecha;
+      session.ejercicios.forEach(ej => {
+        if (ej.nombre === selectedExerciseName && ej.peso && !isNaN(parseFloat(ej.peso))) {
+          exerciseDataPoints.push({ date: date, peso: parseFloat(ej.peso) });
+        }
       });
+    });
 
-      // Ordenar los puntos por fecha para el gráfico
-      const sortedExerciseData = exerciseDataPoints.sort((a, b) => {
-          const [dayA, monthA, yearA] = a.date.split('/');
-          const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
-          const [dayB, monthB, yearB] = b.date.split('/');
-          const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
-          return dateA - dateB;
-      });
+    // Ordenar los datos por fecha
+    const sortedExerciseData = [...exerciseDataPoints].sort((a, b) => {
+      const [dayA, monthA, yearA] = a.date.split('/');
+      const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
+      const [dayB, monthB, yearB] = b.date.split('/');
+      const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
+      return dateA - dateB;
+    });
 
-      const labels = sortedExerciseData.map(point => point.date);
-      const data = sortedExerciseData.map(point => point.peso);
+    const labels = sortedExerciseData.map(point => point.date);
+    const data = sortedExerciseData.map(point => point.peso);
 
-      exerciseChartInstance = new Chart(ctx, {
-          type: 'line',
-          data: {
-              labels: labels,
-              datasets: [{
-                  label: `Peso (kg) para ${selectedExerciseName}`,
-                  data: data,
-                  borderColor: getComputedStyle(document.documentElement).getPropertyValue('--accent').trim(),
-                  borderWidth: 2,
-                  fill: false,
-                  tension: 0.1
-              }]
+    // Get computed styles for chart colors
+    const computedStyle = getComputedStyle(document.documentElement);
+    const textColor = computedStyle.getPropertyValue('--text').trim();
+    const accentColor = computedStyle.getPropertyValue('--accent').trim();
+    const gridColor = computedStyle.getPropertyValue('--border').trim();
+
+    exerciseChartInstance = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: labels,
+        datasets: [{
+          label: `Peso (kg) para ${selectedExerciseName}`,
+          data: data,
+          borderColor: accentColor,
+          borderWidth: 2,
+          fill: false,
+          tension: 0.1
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: false,
+            title: {
+              display: true,
+              text: 'Peso (kg)',
+              color: textColor
+            },
+            ticks: {
+              color: textColor
+            },
+            grid: {
+              color: gridColor
+            }
           },
-          options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                  y: {
-                      beginAtZero: false,
-                      title: {
-                          display: true,
-                          text: 'Peso (kg)',
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--text').trim()
-                      },
-                      ticks: {
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--text').trim()
-                      },
-                      grid: {
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--border').trim()
-                      }
-                  },
-                  x: {
-                      title: {
-                          display: true,
-                          text: 'Fecha',
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--text').trim()
-                      },
-                      ticks: {
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--text').trim()
-                      },
-                      grid: {
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--border').trim()
-                      }
-                  }
-              },
-              plugins: {
-                  legend: {
-                      labels: {
-                          color: getComputedStyle(document.documentElement).getPropertyValue('--text').trim()
-                      }
-                  }
-              }
+          x: {
+            title: {
+              display: true,
+              text: 'Fecha',
+              color: textColor
+            },
+            ticks: {
+              color: textColor
+            },
+            grid: {
+              color: gridColor
+            }
           }
-      });
+        },
+        plugins: {
+          legend: {
+            labels: {
+              color: textColor
+            }
+          }
+        }
+      }
+    });
   }
-
 
   // --- Foto de Progreso ---
   function handleFileSelect(event) {
     const file = event.target.files[0];
     if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            localStorage.setItem('last_progress_photo', e.target.result);
-            displayLastPhoto();
-        };
-        reader.readAsDataURL(file);
-        alert("Foto guardada localmente.");
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        localStorage.setItem('last_progress_photo', e.target.result);
+        displayLastPhoto();
+      };
+      reader.readAsDataURL(file);
+      alert("Foto guardada localmente.");
     } else {
-        alert("Por favor, selecciona un archivo de imagen.");
+      alert("Por favor, selecciona un archivo de imagen.");
     }
   }
 
   function displayLastPhoto() {
-      const storedPhoto = localStorage.getItem('last_progress_photo');
-      const imgElement = document.getElementById('lastPhoto');
-      if (storedPhoto) {
-          imgElement.src = storedPhoto;
-          imgElement.style.display = 'block';
-      } else {
-          imgElement.style.display = 'none';
-      }
+    const storedPhoto = localStorage.getItem('last_progress_photo');
+    const imgElement = document.getElementById('lastPhoto');
+    if (storedPhoto) {
+      imgElement.src = storedPhoto;
+      imgElement.style.display = 'block';
+    } else {
+      imgElement.style.display = 'none';
+    }
   }
 
-
-  // --- Carga de Ejercicios y Historial (con nuevos campos: Notas, RPE) ---
+  // --- Carga de Ejercicios y Historial (con notas, RPE eliminado) ---
   let ejerciciosSesiones = JSON.parse(localStorage.getItem("ejercicios_sesiones") || "[]");
 
-  function cargarEjerciciosTablaActual() {
-    const tbody = document.querySelector("#tablaEjercicios tbody");
-    tbody.innerHTML = "";
-    
-    const currentSessionExercises = JSON.parse(localStorage.getItem("current_session_exercises") || "[]");
-    
-    currentSessionExercises.forEach((e, i) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td contenteditable="true">${e.nombre}</td>
-            <td contenteditable="true">${e.series}</td>
-            <td contenteditable="true">${e.peso}</td>
-            <td contenteditable="true">${e.notas || ''}</td>
-            <td contenteditable="true">${e.rpe || ''}</td>
-            <td>
-                <button class="small-btn button-danger" onclick="borrarFilaTablaActual(${i})">🗑</button>
-            </td>`;
-        tbody.appendChild(row);
-    });
-  }
-
-  function addFila(nombre = "Nuevo ejercicio", series = "3x10", peso = "0", notas = "", rpe = "") {
+  function addFila() {
     const tbody = document.querySelector("#tablaEjercicios tbody");
     const row = document.createElement("tr");
     row.innerHTML = `
-      <td contenteditable="true">${nombre}</td>
-      <td contenteditable="true">${series}</td>
-      <td contenteditable="true">${peso}</td>
-      <td contenteditable="true">${notas}</td>
-      <td contenteditable="true">${rpe}</td>
-      <td><button class="small-btn button-danger" onclick="this.closest('tr').remove(); guardarEjerciciosTablaActualTemp();">🗑</button></td>`;
+      <td contenteditable="true"></td>
+      <td contenteditable="true"></td>
+      <td contenteditable="true"></td>
+      <td contenteditable="true"></td>
+      <td><button class="small-btn button-danger" onclick="borrarFilaTablaActual(this.parentNode.parentNode.rowIndex - 1)">🗑️</button></td>
+    `;
     tbody.appendChild(row);
     guardarEjerciciosTablaActualTemp();
   }
 
   function addEjercicioFromCalendar() {
-      const select = document.getElementById("selectEjercicioCalendario");
-      const selectedExercise = select.value;
-
-      if (selectedExercise) {
-          addFila(selectedExercise);
-          select.value = "";
-      } else {
-          alert("Por favor, selecciona un ejercicio del calendario.");
-      }
+    const select = document.getElementById("selectEjercicioCalendario");
+    const selectedExercise = select.value;
+    if (selectedExercise) {
+        const tbody = document.querySelector("#tablaEjercicios tbody");
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td contenteditable="true">${selectedExercise}</td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td contenteditable="true"></td>
+            <td><button class="small-btn button-danger" onclick="borrarFilaTablaActual(this.parentNode.parentNode.rowIndex - 1)">🗑️</button></td>
+        `;
+        tbody.appendChild(row);
+        guardarEjerciciosTablaActualTemp();
+        select.value = ""; // Reset dropdown
+    } else {
+        alert("Por favor, selecciona un ejercicio del calendario.");
+    }
   }
-  
+
+
+  function cargarEjerciciosTablaActual() {
+    const tbody = document.querySelector("#tablaEjercicios tbody");
+    tbody.innerHTML = "";
+    const currentSessionExercises = JSON.parse(localStorage.getItem("current_session_exercises") || "[]");
+    currentSessionExercises.forEach((e, i) => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td contenteditable="true">${e.nombre}</td>
+        <td contenteditable="true">${e.series}</td>
+        <td contenteditable="true">${e.peso}</td>
+        <td contenteditable="true">${e.notas || ''}</td>
+        <td><button class="small-btn button-danger" onclick="borrarFilaTablaActual(${i})">🗑️</button></td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  // Guardar temporalmente la tabla de ejercicios actual (sin RPE)
   function guardarEjerciciosTablaActualTemp() {
-      const filas = document.querySelectorAll("#tablaEjercicios tbody tr");
-      const lista = [];
-      filas.forEach(fila => {
-          const celdas = fila.querySelectorAll("td");
-          if (celdas.length >= 5) { // Ahora 5 celdas: nombre, series, peso, notas, rpe
-              lista.push({
-                  nombre: celdas[0].innerText.trim(),
-                  series: celdas[1].innerText.trim(),
-                  peso: celdas[2].innerText.trim(),
-                  notas: celdas[3].innerText.trim(), // Nuevo campo
-                  rpe: celdas[4].innerText.trim()    // Nuevo campo
-              });
-          }
-      });
-      localStorage.setItem("current_session_exercises", JSON.stringify(lista));
+    const filas = document.querySelectorAll("#tablaEjercicios tbody tr");
+    const lista = [];
+    filas.forEach(fila => {
+      const celdas = fila.querySelectorAll("td");
+      if (celdas.length >= 4) { // Ahora 4 celdas: nombre, series, peso, notas
+        lista.push({
+          nombre: celdas[0].innerText.trim(),
+          series: celdas[1].innerText.trim(),
+          peso: celdas[2].innerText.trim(),
+          notas: celdas[3].innerText.trim()
+        });
+      }
+    });
+    localStorage.setItem("current_session_exercises", JSON.stringify(lista));
   }
 
   function borrarFilaTablaActual(index) {
     const tbody = document.querySelector("#tablaEjercicios tbody");
     if (tbody.rows[index]) {
-        tbody.rows[index].remove();
-        guardarEjerciciosTablaActualTemp();
+      tbody.rows[index].remove();
+      guardarEjerciciosTablaActualTemp();
     }
   }
 
   function confirmClearCurrentEjercicios() {
     if (confirm("¿Estás seguro de que quieres borrar todos los ejercicios de la tabla actual?")) {
-        localStorage.removeItem("current_session_exercises");
-        cargarEjerciciosTablaActual(); // Usar cargarEjerciciosTablaActual para refrescar la tabla vacía
-        const ejerciciosMessage = document.getElementById("ejerciciosMessage");
-        ejerciciosMessage.innerText = "Ejercicios actuales borrados de la tabla.";
-        ejerciciosMessage.className = "message success";
-        ejerciciosMessage.style.display = "block";
-        setTimeout(() => { ejerciciosMessage.style.display = "none"; }, 3000);
+      localStorage.removeItem("current_session_exercises");
+      cargarEjerciciosTablaActual(); // Usar cargarEjerciciosTablaActual para refrescar la tabla vacía
+      const ejerciciosMessage = document.getElementById("ejerciciosMessage");
+      ejerciciosMessage.innerText = "Ejercicios actuales borrados de la tabla.";
+      ejerciciosMessage.className = "message success";
+      ejerciciosMessage.style.display = "block";
+      setTimeout(() => { ejerciciosMessage.style.display = "none"; }, 3000);
     }
   }
 
@@ -933,36 +1013,32 @@
     const listaEjerciciosSesion = [];
     filas.forEach(fila => {
       const celdas = fila.querySelectorAll("td");
-      if (celdas.length >= 5) { // Asegurarse de capturar los nuevos campos
+      if (celdas.length >= 4) { // Asegurarse de capturar los campos correctos
         listaEjerciciosSesion.push({
           nombre: celdas[0].innerText.trim(),
           series: celdas[1].innerText.trim(),
           peso: celdas[2].innerText.trim(),
-          notas: celdas[3].innerText.trim(),
-          rpe: celdas[4].innerText.trim()
+          notas: celdas[3].innerText.trim()
         });
       }
     });
 
     if (listaEjerciciosSesion.length === 0) {
-        const ejerciciosMessage = document.getElementById("ejerciciosMessage");
-        ejerciciosMessage.innerText = "No hay ejercicios para guardar en la sesión.";
-        ejerciciosMessage.className = "message error";
-        ejerciciosMessage.style.display = "block";
-        setTimeout(() => { ejerciciosMessage.style.display = "none"; }, 3000);
-        return;
+      const ejerciciosMessage = document.getElementById("ejerciciosMessage");
+      ejerciciosMessage.innerText = "No hay ejercicios para guardar en la sesión.";
+      ejerciciosMessage.className = "message error";
+      ejerciciosMessage.style.display = "block";
+      setTimeout(() => { ejerciciosMessage.style.display = "none"; }, 3000);
+      return;
     }
 
     const fechaActual = new Date().toLocaleDateString("es-ES");
     const indexExistente = ejerciciosSesiones.findIndex(s => s.fecha === fechaActual);
 
     if (indexExistente !== -1) {
-        ejerciciosSesiones[indexExistente].ejercicios = listaEjerciciosSesion;
+      ejerciciosSesiones[indexExistente].ejercicios = listaEjerciciosSesion;
     } else {
-        ejerciciosSesiones.push({
-            fecha: fechaActual,
-            ejercicios: listaEjerciciosSesion
-        });
+      ejerciciosSesiones.push({ fecha: fechaActual, ejercicios: listaEjerciciosSesion });
     }
 
     localStorage.setItem("ejercicios_sesiones", JSON.stringify(ejerciciosSesiones));
@@ -972,64 +1048,63 @@
     ejerciciosMessage.style.display = "block";
     setTimeout(() => { ejerciciosMessage.style.display = "none"; }, 3000);
 
-    populateExerciseHistoryDropdown();
+    populateExerciseHistoryDropdown(); // Actualizar dropdown del historial
     populateExerciseChartDropdown(); // Actualizar dropdown de gráficos
-    // Recargar los ejercicios de la tabla actual para que muestre el estado guardado
-    cargarEjerciciosTablaActual();
   }
 
-  // Funciones para el historial de sesiones de ejercicio
   function populateExerciseHistoryDropdown() {
-      const select = document.getElementById("selectHistoryDate");
-      select.innerHTML = '<option value="">Selecciona una fecha...</option>';
+    const select = document.getElementById("selectHistoryDate");
+    select.innerHTML = "<option value=''>Selecciona una fecha...</option>"; // Reset dropdown
 
-      const sortedSessions = [...ejerciciosSesiones].sort((a, b) => {
-          const [dayA, monthA, yearA] = a.fecha.split('/');
-          const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
-          const [dayB, monthB, yearB] = b.fecha.split('/');
-          const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
-          return dateB - dateA;
-      });
+    // Obtener todas las fechas únicas y ordenarlas de más reciente a más antigua
+    const uniqueDates = [...new Set(ejerciciosSesiones.map(s => s.fecha))].sort((a, b) => {
+        const [dayA, monthA, yearA] = a.split('/');
+        const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
+        const [dayB, monthB, yearB] = b.split('/');
+        const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
+        return dateB - dateA; // Ordenar de forma descendente (más reciente primero)
+    });
 
-      sortedSessions.forEach(session => {
-          const option = document.createElement("option");
-          option.value = session.fecha;
-          option.textContent = session.fecha;
-          select.appendChild(option);
-      });
+    uniqueDates.forEach(date => {
+        const option = document.createElement("option");
+        option.value = date;
+        option.textContent = date;
+        select.appendChild(option);
+    });
 
-      if (sortedSessions.length > 0) {
-          select.value = sortedSessions[0].fecha;
-          displaySelectedExerciseSession();
-      } else {
-          document.getElementById("exerciseHistoryDisplay").innerHTML = "<p>No hay sesiones de ejercicio guardadas.</p>";
-      }
+    // Si hay historial, mostrar la última sesión automáticamente
+    if (uniqueDates.length > 0) {
+        select.value = uniqueDates[0];
+        displaySelectedExerciseSession();
+    } else {
+        document.getElementById("exerciseHistoryDisplay").innerHTML = "<p>No hay sesiones de ejercicio guardadas.</p>";
+    }
   }
 
   function displaySelectedExerciseSession() {
-      const select = document.getElementById("selectHistoryDate");
-      const selectedDate = select.value;
-      const displayDiv = document.getElementById("exerciseHistoryDisplay");
-      displayDiv.innerHTML = "";
+    const select = document.getElementById("selectHistoryDate");
+    const selectedDate = select.value;
+    const displayDiv = document.getElementById("exerciseHistoryDisplay");
+    displayDiv.innerHTML = "";
 
-      if (!selectedDate) {
-          displayDiv.innerHTML = "<p>Selecciona una fecha para ver la sesión.</p>";
-          return;
-      }
+    if (!selectedDate) {
+      displayDiv.innerHTML = "<p>Selecciona una fecha para ver la sesión.</p>";
+      return;
+    }
 
-      const session = ejerciciosSesiones.find(s => s.fecha === selectedDate);
+    const session = ejerciciosSesiones.find(s => s.fecha === selectedDate);
 
-      if (session && session.ejercicios && session.ejercicios.length > 0) {
-          let html = `<p><b>Ejercicios del ${selectedDate}:</b></p>`;
-          html += `<table class="exercise-history-table"><thead><tr><th>Ejercicio</th><th>Series</th><th>Peso (kg)</th><th>Notas</th><th>RPE</th></tr></thead><tbody>`;
-          session.ejercicios.forEach(ej => {
-              html += `<tr><td>${ej.nombre}</td><td>${ej.series}</td><td>${ej.peso}</td><td>${ej.notas || ''}</td><td>${ej.rpe || ''}</td></tr>`;
-          });
-          html += `</tbody></table>`;
-          displayDiv.innerHTML = html;
-      } else {
-          displayDiv.innerHTML = `<p>No se encontraron ejercicios para el ${selectedDate}.</p>`;
-      }
+    if (session && session.ejercicios && session.ejercicios.length > 0) {
+      let html = `<p><b>Ejercicios del ${selectedDate}:</b></p>`;
+      html += `<table class="exercise-history-table"><thead><tr><th>Ejercicio</th><th>Series</th><th>Peso (kg)</th><th>Notas</th></tr></thead><tbody>`; // Removed RPE header
+      session.ejercicios.forEach(ej => {
+        html += `<tr><td>${ej.nombre}</td><td>${ej.series}</td><td>${ej.peso}</td><td>${ej.notas || ''}</td></tr>`; // Removed RPE cell
+      });
+      html += `</tbody></table>`;
+      displayDiv.innerHTML = html;
+    } else {
+      displayDiv.innerHTML = `<p>No se encontraron ejercicios para el ${selectedDate}.</p>`;
+    }
   }
 
   function confirmClearAllExerciseHistory() {
@@ -1047,7 +1122,6 @@
     alert("Todo el historial de sesiones de ejercicio ha sido borrado.");
   }
 
-
   // --- Temporizador de Descanso ---
   let timerInterval;
   let timeLeft = 0;
@@ -1057,120 +1131,173 @@
   const timerResetBtn = document.getElementById('timerResetBtn');
 
   function startTimer() {
-      const duration = parseInt(restTimeInput.value);
-      if (isNaN(duration) || duration <= 0) {
-          alert("Por favor, introduce un tiempo de descanso válido (en segundos).");
-          return;
+    const duration = parseInt(restTimeInput.value);
+    if (isNaN(duration) || duration <= 0) {
+      alert("Por favor, introduce un tiempo de descanso válido (en segundos).");
+      return;
+    }
+    timeLeft = duration;
+    updateTimerDisplay();
+    timerStartBtn.style.display = 'none';
+    timerResetBtn.style.display = 'inline-block';
+    restTimeInput.disabled = true;
+
+    timerInterval = setInterval(() => {
+      timeLeft--;
+      updateTimerDisplay();
+      if (timeLeft <= 0) {
+        clearInterval(timerInterval);
+        countdownDisplay.innerText = "¡Listo!";
+        timerStartBtn.style.display = 'inline-block';
+        timerResetBtn.style.display = 'none';
+        restTimeInput.disabled = false;
+        // Opcional: vibrar o reproducir sonido
+        if ('vibrate' in navigator) {
+            navigator.vibrate(200); // Vibrate for 200ms
+        }
       }
-
-      timeLeft = duration;
-      updateTimerDisplay();
-
-      timerStartBtn.style.display = 'none';
-      timerResetBtn.style.display = 'inline-block';
-      restTimeInput.disabled = true;
-
-      timerInterval = setInterval(() => {
-          timeLeft--;
-          updateTimerDisplay();
-          if (timeLeft <= 0) {
-              clearInterval(timerInterval);
-              countdownDisplay.innerText = "¡Listo!";
-              timerStartBtn.style.display = 'inline-block';
-              timerResetBtn.style.display = 'none';
-              restTimeInput.disabled = false;
-              alert("¡Tiempo de descanso terminado!");
-              // Opcional: Vibrar o reproducir sonido
-              if (navigator.vibrate) { navigator.vibrate(200); }
-          }
-      }, 1000);
-  }
-
-  function resetTimer() {
-      clearInterval(timerInterval);
-      timeLeft = 0;
-      updateTimerDisplay();
-      timerStartBtn.style.display = 'inline-block';
-      timerResetBtn.style.display = 'none';
-      restTimeInput.disabled = false;
-      countdownDisplay.innerText = "";
+    }, 1000);
   }
 
   function updateTimerDisplay() {
-      const minutes = Math.floor(timeLeft / 60);
-      const seconds = timeLeft % 60;
-      countdownDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    countdownDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
   }
 
+  function resetTimer() {
+    clearInterval(timerInterval);
+    timeLeft = 0;
+    updateTimerDisplay();
+    timerStartBtn.style.display = 'inline-block';
+    timerResetBtn.style.display = 'none';
+    restTimeInput.disabled = false;
+    countdownDisplay.innerText = ""; // Clear display
+  }
 
-  // --- Exportar/Importar Datos ---
+  // --- Gestión de Datos ---
   function exportData() {
-      const data = {
-          peso_historial: JSON.parse(localStorage.getItem("peso_historial") || "[]"),
-          ejercicios_sesiones: JSON.parse(localStorage.getItem("ejercicios_sesiones") || "[]"),
-          planEntrenamiento: JSON.parse(localStorage.getItem("planEntrenamiento") || "{}"),
-          masterExercises: JSON.parse(localStorage.getItem("masterExercises") || "[]"),
-          last_progress_photo: localStorage.getItem("last_progress_photo"),
-          // Opcional: Exportar otros datos como darkMode preference si es relevante
-          darkMode: localStorage.getItem("darkMode")
-      };
+    const data = {
+      peso_historial: JSON.parse(localStorage.getItem("peso_historial") || "[]"),
+      ejercicios_sesiones: JSON.parse(localStorage.getItem("ejercicios_sesiones") || "[]"),
+      planEntrenamiento: JSON.parse(localStorage.getItem("planEntrenamiento") || "{}"),
+      current_session_exercises: JSON.parse(localStorage.getItem("current_session_exercises") || "[]"),
+      darkMode: localStorage.getItem("darkMode"),
+      last_progress_photo: localStorage.getItem("last_progress_photo")
+    };
 
-      const filename = `plan_fit_data_${new Date().toISOString().slice(0, 10)}.json`;
-      const jsonStr = JSON.stringify(data, null, 2); // null, 2 para formato legible
-      const blob = new Blob([jsonStr], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = filename;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+    const filename = `mi_plan_fit_backup_${new Date().toISOString().slice(0,10)}.json`;
+    const jsonStr = JSON.stringify(data, null, 2); // null, 2 para formato legible
+    const blob = new Blob([jsonStr], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 
-      const dataMessage = document.getElementById("dataMessage");
-      dataMessage.innerText = "Datos exportados correctamente.";
-      dataMessage.className = "message success";
-      dataMessage.style.display = "block";
-      setTimeout(() => { dataMessage.style.display = "none"; }, 3000);
+    const dataMessage = document.getElementById("dataMessage");
+    // dataMessage might be hidden now due to menu structure, show it programmatically
+    if (!dataMessage) { // Create if not present in main body
+        const newMsgDiv = document.createElement('div');
+        newMsgDiv.id = 'dataMessage';
+        newMsgDiv.className = 'message success';
+        newMsgDiv.style.display = 'block';
+        newMsgDiv.innerText = "Datos exportados correctamente.";
+        document.body.appendChild(newMsgDiv);
+        setTimeout(() => { newMsgDiv.remove(); }, 3000);
+    } else {
+        dataMessage.innerText = "Datos exportados correctamente.";
+        dataMessage.className = "message success";
+        dataMessage.style.display = "block";
+        setTimeout(() => { dataMessage.style.display = "none"; }, 3000);
+    }
   }
 
   document.getElementById('importFileInput').addEventListener('change', function(event) {
-      const file = event.target.files[0];
-      if (!file) return;
+    const file = event.target.files[0];
+    if (!file) return;
 
-      if (confirm("ADVERTENCIA: ¿Estás seguro de que quieres importar datos? Esto SOBRESCRIBIRÁ todos tus datos actuales de peso, ejercicios y configuración. Esta acción es irreversible.")) {
-          const reader = new FileReader();
-          reader.onload = function(e) {
-              try {
-                  const importedData = JSON.parse(e.target.result);
-                  
-                  if (importedData.peso_historial) localStorage.setItem("peso_historial", JSON.stringify(importedData.peso_historial));
-                  if (importedData.ejercicios_sesiones) localStorage.setItem("ejercicios_sesiones", JSON.stringify(importedData.ejercicios_sesiones));
-                  if (importedData.planEntrenamiento) localStorage.setItem("planEntrenamiento", JSON.stringify(importedData.planEntrenamiento));
-                  if (importedData.masterExercises) localStorage.setItem("masterExercises", JSON.stringify(importedData.masterExercises));
-                  if (importedData.last_progress_photo) localStorage.setItem("last_progress_photo", importedData.last_progress_photo);
-                  if (importedData.darkMode) localStorage.setItem("darkMode", importedData.darkMode);
+    if (confirm("ADVERTENCIA: ¿Estás seguro de que quieres importar datos? Esto SOBRESCRIBIRÁ todos tus datos actuales de peso, ejercicios y configuración. Esta acción es irreversible.")) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const importedData = JSON.parse(e.target.result);
+          if (importedData.peso_historial) localStorage.setItem("peso_historial", JSON.stringify(importedData.peso_historial));
+          if (importedData.ejercicios_sesiones) localStorage.setItem("ejercicios_sesiones", JSON.stringify(importedData.ejercicios_sesiones));
+          if (importedData.planEntrenamiento) localStorage.setItem("planEntrenamiento", JSON.stringify(importedData.planEntrenamiento));
+          if (importedData.current_session_exercises) localStorage.setItem("current_session_exercises", JSON.stringify(importedData.current_session_exercises));
+          if (importedData.darkMode !== undefined) localStorage.setItem("darkMode", importedData.darkMode);
+          if (importedData.last_progress_photo !== undefined) localStorage.setItem("last_progress_photo", importedData.last_progress_photo);
 
-                  const dataMessage = document.getElementById("dataMessage");
-                  dataMessage.innerText = "Datos importados correctamente. La aplicación se recargará.";
-                  dataMessage.className = "message success";
-                  dataMessage.style.display = "block";
-                  setTimeout(() => { location.reload(); }, 2000); // Recargar la página para aplicar todos los cambios
-              } catch (error) {
-                  const dataMessage = document.getElementById("dataMessage");
-                  dataMessage.innerText = "Error al importar datos: el archivo no es válido o está corrupto.";
-                  dataMessage.className = "message error";
-                  dataMessage.style.display = "block";
-                  console.error("Error importing data:", error);
-              }
-          };
-          reader.readAsText(file);
-      } else {
-        // Clear the file input if user cancels to allow re-selection of the same file
-        event.target.value = ''; 
-      }
+          // Recargar todos los elementos de la UI para reflejar los datos importados
+          cargarChecks();
+          planEntrenamientoIndex = JSON.parse(localStorage.getItem("planEntrenamiento") || "{}"); // Actualizar global
+          cargarEjerciciosDias();
+          pesos = JSON.parse(localStorage.getItem("peso_historial") || "[]"); // Actualizar global
+          displayPesoHistory();
+          updateWeightChart();
+          ejerciciosSesiones = JSON.parse(localStorage.getItem("ejercicios_sesiones") || "[]"); // Actualizar global
+          populateExerciseChartDropdown();
+          populateExerciseHistoryDropdown();
+          cargarEjerciciosTablaActual();
+          displayLastPhoto();
+          setDarkMode(localStorage.getItem('darkMode') === 'enabled'); // Apply dark mode if imported
+
+          const dataMessage = document.getElementById("dataMessage");
+           if (!dataMessage) { // Create if not present in main body
+                const newMsgDiv = document.createElement('div');
+                newMsgDiv.id = 'dataMessage';
+                newMsgDiv.className = 'message success';
+                newMsgDiv.style.display = 'block';
+                newMsgDiv.innerText = "Datos importados correctamente. La aplicación se ha actualizado.";
+                document.body.appendChild(newMsgDiv);
+                setTimeout(() => { newMsgDiv.remove(); }, 5000);
+            } else {
+                dataMessage.innerText = "Datos importados correctamente. La aplicación se ha actualizado.";
+                dataMessage.className = "message success";
+                dataMessage.style.display = "block";
+                setTimeout(() => { dataMessage.style.display = "none"; }, 5000);
+            }
+
+        } catch (e) {
+          alert("Error al importar el archivo. Asegúrate de que sea un archivo JSON válido de respaldo.");
+          console.error("Error importing file:", e);
+          const dataMessage = document.getElementById("dataMessage");
+          if (!dataMessage) { // Create if not present in main body
+                const newMsgDiv = document.createElement('div');
+                newMsgDiv.id = 'dataMessage';
+                newMsgDiv.className = 'message error';
+                newMsgDiv.style.display = 'block';
+                newMsgDiv.innerText = "Error al importar datos.";
+                document.body.appendChild(newMsgDiv);
+                setTimeout(() => { newMsgDiv.remove(); }, 3000);
+            } else {
+                dataMessage.innerText = "Error al importar datos.";
+                dataMessage.className = "message error";
+                dataMessage.style.display = "block";
+                setTimeout(() => { dataMessage.style.display = "none"; }, 3000);
+            }
+        } finally {
+            event.target.value = ''; // Clear the file input if user cancels to allow re-selection of the same file
+        }
+      };
+      reader.readAsText(file);
+    } else {
+        event.target.value = ''; // Clear the file input if user cancels to allow re-selection of the same file
+    }
   });
+
+  // Function to hide dropdown after click
+  function hideDropdown(element) {
+    // Find the parent dropdown-content and set its display to none
+    let parent = element.closest('.dropdown-content');
+    if (parent) {
+      parent.style.display = 'none';
+    }
+  }
 
 
   // --- Inicialización al Cargar la Página ---
@@ -1205,6 +1332,7 @@
         });
     });
   }
+
 </script>
 </body>
 </html>
