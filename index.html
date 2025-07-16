@@ -472,7 +472,8 @@
     // --- Variables Globales ---
     let planEntrenamientoIndex = {}; // Almacena el plan de entrenamiento semanal
     let currentDay = 0; // Índice del día actual (0 para Lunes, 1 para Martes, etc.)
-    let ejerciciosSesiones = []; // Historial de ejercicios completados
+    let ejerciciosSesiones = []; // Historial de ejercicios completados (permanente)
+    let dailySessionExercises = []; // Ejercicios añadidos en la sesión actual (temporal)
     let pesos = []; // Historial de pesos registrados
     let userHeight = null; // Altura del usuario en metros
     let weightChartInstance = null; // Instancia del gráfico de peso
@@ -490,11 +491,11 @@
     const exerciseRepsInput = document.getElementById('exerciseReps');
     const exerciseWeightInput = document.getElementById('exerciseWeight');
     const exerciseNotesInput = document.getElementById('exerciseNotes');
-    const userHeightInput = document.getElementById('userHeight'); // Nuevo
+    const userHeightInput = document.getElementById('userHeight');
     const currentWeightInput = document.getElementById('currentWeight');
     const addWeightBtn = document.getElementById('addWeightBtn');
     const weightHistoryList = document.getElementById('weightHistoryList');
-    const bmiDisplay = document.getElementById('bmiDisplay'); // Nuevo
+    const bmiDisplay = document.getElementById('bmiDisplay');
     const exerciseHistoryDropdown = document.getElementById('exerciseHistoryDropdown');
     const exerciseHistoryDisplay = document.getElementById('exerciseHistoryDisplay');
     const dropdownBtn = document.getElementById('dropdownBtn');
@@ -528,18 +529,33 @@
         localStorage.setItem("peso_historial", JSON.stringify(pesos));
     }
 
-    function saveUserHeight() { // Nuevo
+    function saveUserHeight() {
         localStorage.setItem("user_height", JSON.stringify(userHeight));
     }
+    
+    // Guardar los ejercicios temporales de la sesión actual
+    function saveDailySessionExercises() {
+        const today = new Date().toISOString().split('T')[0];
+        const key = `daily_session_exercises_${today}_day${currentDay}`;
+        localStorage.setItem(key, JSON.stringify(dailySessionExercises));
+    }
+
+    // Cargar los ejercicios temporales de la sesión actual
+    function loadDailySessionExercises() {
+        const today = new Date().toISOString().split('T')[0];
+        const key = `daily_session_exercises_${today}_day${currentDay}`;
+        dailySessionExercises = JSON.parse(localStorage.getItem(key)) || [];
+    }
+
 
     // Cargar datos de localStorage
     function loadData() {
         planEntrenamientoIndex = JSON.parse(localStorage.getItem("planEntrenamiento")) || {};
         ejerciciosSesiones = JSON.parse(localStorage.getItem("ejercicios_sesiones")) || [];
         pesos = JSON.parse(localStorage.getItem("peso_historial")) || [];
-        userHeight = JSON.parse(localStorage.getItem("user_height")) || null; // Nuevo
+        userHeight = JSON.parse(localStorage.getItem("user_height")) || null;
         if (userHeight) {
-            userHeightInput.value = userHeight; // Cargar la altura en el input
+            userHeightInput.value = userHeight;
         }
     }
 
@@ -572,66 +588,50 @@
             dayPlan.ejercicios.forEach((ejercicio, index) => {
                 const p = document.createElement('p');
                 const checkboxId = `checkbox-dia-${currentDay + 1}-ejercicio-${index}`;
-                p.innerHTML = `<input type="checkbox" id="${checkboxId}" data-day="${currentDay + 1}" data-exercise-index="${index}" />
-                               <label for="${checkboxId}">${ejercicio}</label>`;
+                // Mostrar detalles del ejercicio si están disponibles
+                const exerciseDetails = ejercicio.sets && ejercicio.reps && ejercicio.weight !== undefined ?
+                                        ` (${ejercicio.sets}x${ejercicio.reps} @ ${ejercicio.weight}kg)` : '';
+                p.innerHTML = `<input type="checkbox" id="${checkboxId}" data-day="${currentDay + 1}" data-exercise-name="${ejercicio.name}" />
+                               <label for="${checkboxId}">${ejercicio.name}${exerciseDetails}</label>`;
                 currentDayExercisesDiv.appendChild(p);
             });
         } else {
             currentDayExercisesDiv.innerHTML = `<p>No hay ejercicios definidos para el ${daysOfWeek[currentDay]}. Puedes editarlos en "Editar Plan Semanal".</p>`;
         }
-        cargarChecks(); // Cargar el estado de los checkboxes
+        markCompletedDailyExercises(); // Marcar los checkboxes según dailySessionExercises
     }
 
-    // Guardar el estado de los checkboxes
-    function guardarChecks() {
-        const checks = {};
+    // Marcar los checkboxes de los ejercicios ya añadidos a la sesión temporal
+    function markCompletedDailyExercises() {
         document.querySelectorAll('#currentDayExercises input[type="checkbox"]').forEach(checkbox => {
-            const day = checkbox.dataset.day;
-            const index = checkbox.dataset.exerciseIndex;
-            if (!checks[day]) {
-                checks[day] = {};
-            }
-            checks[day][index] = checkbox.checked;
-        });
-        localStorage.setItem("checkbox_estados", JSON.stringify(checks));
-    }
-
-    // Cargar el estado de los checkboxes
-    function cargarChecks() {
-        const checks = JSON.parse(localStorage.getItem("checkbox_estados") || "{}");
-        document.querySelectorAll('#currentDayExercises input[type="checkbox"]').forEach(checkbox => {
-            const day = checkbox.dataset.day;
-            const index = checkbox.dataset.exerciseIndex;
-            if (checks[day] && checks[day][index] !== undefined) {
-                checkbox.checked = checks[day][index];
-            }
+            const exerciseName = checkbox.dataset.exerciseName;
+            const isCompleted = dailySessionExercises.some(ej => ej.name === exerciseName);
+            checkbox.checked = isCompleted;
+            // Deshabilitar el checkbox si ya está marcado para evitar desmarcar manualmente
+            checkbox.disabled = isCompleted;
         });
     }
 
-    // Reiniciar los checkboxes para el día actual
-    function resetChecksForCurrentDay() {
-        const checks = JSON.parse(localStorage.getItem("checkbox_estados") || "{}");
-        const dayKey = `day-${currentDay + 1}`;
-        if (checks[dayKey]) {
-            delete checks[dayKey]; // Eliminar el estado de los checkboxes para el día actual
-        }
-        localStorage.setItem("checkbox_estados", JSON.stringify(checks));
-        cargarChecks(); // Volver a cargar para reflejar el cambio
+    // Reiniciar los ejercicios temporales para el día actual y los checkboxes
+    function resetDailySession() {
+        dailySessionExercises = [];
+        const today = new Date().toISOString().split('T')[0];
+        const key = `daily_session_exercises_${today}_day${currentDay}`;
+        localStorage.removeItem(key);
+        cargarEjerciciosDias(); // Recargar para limpiar los checks
     }
 
     // --- Event Listeners para Navegación de Días ---
     prevDayBtn.addEventListener('click', () => {
         currentDay = (currentDay - 1 + 7) % 7; // Ir al día anterior, ciclando
         localStorage.setItem("currentDayIndex", currentDay); // Guardar el día actual
-        cargarEjerciciosDias();
-        resetChecksForCurrentDay(); // Reiniciar checks al cambiar de día
+        resetDailySession(); // Resetear sesión temporal al cambiar de día
     });
 
     nextDayBtn.addEventListener('click', () => {
         currentDay = (currentDay + 1) % 7; // Ir al día siguiente, ciclando
         localStorage.setItem("currentDayIndex", currentDay); // Guardar el día actual
-        cargarEjerciciosDias();
-        resetChecksForCurrentDay(); // Reiniciar checks al cambiar de día
+        resetDailySession(); // Resetear sesión temporal al cambiar de día
     });
 
     // --- Añadir Ejercicio a la Sesión Actual ---
@@ -669,34 +669,67 @@
             notes: notes
         };
 
-        ejerciciosSesiones.push(newExercise);
-        saveEjerciciosSesiones();
-        alert('Ejercicio añadido a la sesión actual!');
+        // Añadir a la sesión temporal
+        // Si el ejercicio ya fue añadido, se actualiza, si no, se añade
+        const existingIndex = dailySessionExercises.findIndex(ej => ej.name === name);
+        if (existingIndex > -1) {
+            dailySessionExercises[existingIndex] = newExercise;
+        } else {
+            dailySessionExercises.push(newExercise);
+        }
+        saveDailySessionExercises(); // Guardar la sesión temporal
+
+        // Marcar el checkbox correspondiente y deshabilitarlo
+        const checkbox = document.querySelector(`input[type="checkbox"][data-exercise-name="${name}"]`);
+        if (checkbox) {
+            checkbox.checked = true;
+            checkbox.disabled = true;
+        }
         
-        // Limpiar campos
+        alert('Ejercicio añadido/actualizado a la sesión actual!');
+        
+        // Limpiar campos para el siguiente ejercicio
         exerciseNameInput.value = '';
         exerciseSetsInput.value = '';
         exerciseRepsInput.value = '';
         exerciseWeightInput.value = '';
         exerciseNotesInput.value = '';
 
-        populateExerciseChartDropdown(); // Actualizar el dropdown de gráficos
-        populateExerciseHistoryDropdown(); // Actualizar el dropdown de historial
+        // NO actualizar gráficos/historial aquí. Se hará en "Finalizar Día".
     });
 
     // --- Finalizar Día de Entrenamiento ---
     finishDayBtn.addEventListener('click', () => {
-        // Aquí podrías añadir lógica adicional como un resumen del día, o simplemente resetear.
+        if (dailySessionExercises.length === 0) {
+            alert("No hay ejercicios registrados en la sesión actual para finalizar.");
+            return;
+        }
+
+        // Añadir todos los ejercicios de la sesión temporal al historial permanente
+        ejerciciosSesiones.push(...dailySessionExercises);
+        saveEjerciciosSesiones(); // Guardar el historial permanente
+
+        // Limpiar y resetear la sesión temporal para el siguiente día/uso
+        resetDailySession(); 
+        
         alert('Día de entrenamiento finalizado! Se han guardado tus progresos.');
-        // Opcional: limpiar los campos de entrada de ejercicio al finalizar el día
+        
+        // Limpiar campos de entrada de ejercicio
         exerciseNameInput.value = '';
         exerciseSetsInput.value = '';
         exerciseRepsInput.value = '';
         exerciseWeightInput.value = '';
         exerciseNotesInput.value = '';
-        
-        // Reiniciar los checks para el día actual
-        resetChecksForCurrentDay();
+
+        // Actualizar los dropdowns y gráficos
+        populateExerciseChartDropdown();
+        populateExerciseHistoryDropdown();
+        // Llamar a updateExerciseChart() y updateWeightChart() explícitamente si se desea que se muestre el último progreso automáticamente.
+        // Opcional: Si quieres que el gráfico de progreso se actualice automáticamente al finalizar el día con el último ejercicio registrado:
+        // if (ejerciciosSesiones.length > 0) {
+        //     exerciseChartSelect.value = ejerciciosSesiones[ejerciciosSesiones.length - 1].name;
+        //     updateExerciseChart();
+        // }
     });
 
     // --- Funciones para Historial de Ejercicios ---
@@ -1073,13 +1106,40 @@
         
         // Cargar el plan de entrenamiento con valores por defecto si no existe
         if (Object.keys(planEntrenamientoIndex).length === 0) {
-            planEntrenamientoIndex['day-1'] = { name: "Día 1 - Full Body Fuerza", ejercicios: ["Peso muerto rumano", "Dominadas asistidas", "Press inclinado", "Plancha", "Bird-dogs"] };
-            planEntrenamientoIndex['day-2'] = { name: "Día 2 - Hipertrofia + Core", ejercicios: ["Sentadilla goblet", "Remo con barra", "Z-Press", "Plancha reach", "Hollow hold"] };
-            planEntrenamientoIndex['day-3'] = { name: "Día 3 - Cardio + Core", ejercicios: ["Caminata inclinada", "2 abdominales a elección", "Movilidad 10 min"] };
+            planEntrenamientoIndex['day-1'] = { name: "Día 1 - Full Body Fuerza", ejercicios: [
+                { name: "Peso muerto rumano", sets: 3, reps: 8, weight: 60 },
+                { name: "Dominadas asistidas", sets: 3, reps: 10, weight: 0 },
+                { name: "Press inclinado", sets: 3, reps: 10, weight: 40 },
+                { name: "Plancha", sets: 3, reps: 60, weight: 0 }, // reps para segundos
+                { name: "Bird-dogs", sets: 3, reps: 12, weight: 0 }
+            ]};
+            planEntrenamientoIndex['day-2'] = { name: "Día 2 - Hipertrofia + Core", ejercicios: [
+                { name: "Sentadilla goblet", sets: 3, reps: 12, weight: 20 },
+                { name: "Remo con barra", sets: 3, reps: 10, weight: 30 },
+                { name: "Z-Press", sets: 3, reps: 8, weight: 15 },
+                { name: "Plancha reach", sets: 3, reps: 45, weight: 0 }, // reps para segundos
+                { name: "Hollow hold", sets: 3, reps: 30, weight: 0 } // reps para segundos
+            ]};
+            planEntrenamientoIndex['day-3'] = { name: "Día 3 - Cardio + Core", ejercicios: [
+                { name: "Caminata inclinada", sets: 1, reps: 30, weight: 0, notes: "minutos" },
+                { name: "Abdominales", sets: 3, reps: 15, weight: 0 },
+                { name: "Movilidad", sets: 1, reps: 10, weight: 0, notes: "minutos" }
+            ]};
             planEntrenamientoIndex['day-4'] = { name: "Día 4 - Descanso", ejercicios: [] };
-            planEntrenamientoIndex['day-5'] = { name: "Día 5 - Tren Superior", ejercicios: ["Press de hombros", "Remo con mancuernas", "Flexiones"] };
-            planEntrenamientoIndex['day-6'] = { name: "Día 6 - Tren Inferior", ejercicios: ["Sentadilla", "Peso muerto", "Zancadas"] };
-            planEntrenamientoIndex['day-7'] = { name: "Día 7 - Actividad Ligera", ejercicios: ["Yoga", "Caminata"] };
+            planEntrenamientoIndex['day-5'] = { name: "Día 5 - Tren Superior", ejercicios: [
+                { name: "Press de hombros", sets: 3, reps: 10, weight: 25 },
+                { name: "Remo con mancuernas", sets: 3, reps: 12, weight: 15 },
+                { name: "Flexiones", sets: 3, reps: 10, weight: 0 }
+            ]};
+            planEntrenamientoIndex['day-6'] = { name: "Día 6 - Tren Inferior", ejercicios: [
+                { name: "Sentadilla", sets: 3, reps: 8, weight: 50 },
+                { name: "Peso muerto", sets: 3, reps: 6, weight: 70 },
+                { name: "Zancadas", sets: 3, reps: 10, weight: 10 }
+            ]};
+            planEntrenamientoIndex['day-7'] = { name: "Día 7 - Actividad Ligera", ejercicios: [
+                { name: "Yoga", sets: 1, reps: 45, weight: 0, notes: "minutos" },
+                { name: "Caminata", sets: 1, reps: 60, weight: 0, notes: "minutos" }
+            ]};
             savePlan(); // Guardar los valores por defecto
         }
 
@@ -1092,7 +1152,8 @@
             currentDay = parseInt(localStorage.getItem("currentDayIndex"));
         }
         
-        cargarEjerciciosDias(); // Cargar los ejercicios para el día inicial
+        loadDailySessionExercises(); // Cargar los ejercicios temporales para el día actual
+        cargarEjerciciosDias(); // Cargar los ejercicios del plan diario y marcar checks
         
         displayPesoHistory(); // Cargar y mostrar el historial de peso
         updateWeightChart(); // Cargar gráfico de peso al inicio
@@ -1103,12 +1164,8 @@
         
         displayLastPhoto(); // Mostrar la última foto guardada
         
-        // Manejar los cambios en los checkboxes de los ejercicios del día
-        currentDayExercisesDiv.addEventListener('change', (event) => {
-            if (event.target.type === 'checkbox') {
-                guardarChecks();
-            }
-        });
+        // Ya no necesitamos un event listener para los checkboxes individuales,
+        // ya que su estado ahora se gestiona automáticamente al añadir ejercicios a la sesión.
     });
 
     // Service Worker Registration
