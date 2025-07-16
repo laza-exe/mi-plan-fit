@@ -54,6 +54,12 @@
     h1, h2, h3 {
       color: var(--primary);
     }
+    .app-title { /* Nuevo estilo para el título principal */
+      text-align: center;
+      margin-top: 0; /* Asegurarse de que no haya margen superior si el body ya tiene padding */
+      margin-bottom: 1.5rem;
+      font-size: 2rem;
+    }
     .section {
       background: var(--card);
       border-radius: 1rem;
@@ -282,16 +288,11 @@
         padding: 0.5rem 1rem;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-end; /* Align to right for menu items */
         align-items: center;
         z-index: 1000;
         box-sizing: border-box;
         transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
-    }
-    .fixed-header h1 {
-        margin: 0;
-        font-size: 1.5rem;
-        color: var(--primary);
     }
     .menu-right {
         display: flex;
@@ -305,10 +306,10 @@
         display: inline-block;
     }
     .dropdown-content {
-        display: none;
+        display: none; /* Controlado por JS ahora */
         position: absolute;
         background-color: var(--card);
-        min-width: 200px;
+        min-width: 220px; /* Un poco más ancho para las opciones */
         box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
         z-index: 1;
         right: 0; /* Align to the right */
@@ -327,17 +328,17 @@
     .dropdown-content a:hover {
         background-color: var(--border);
     }
-    .dropdown:hover .dropdown-content {
-        display: block;
-    }
+    /* Eliminado el :hover para .dropdown-content, se controla por JS */
     .dropbtn {
         background-color: var(--primary);
-        color: white;
+        color: var(--text); /* Cambia con el modo oscuro */
         padding: 10px 15px;
-        font-size: 1rem;
+        font-size: 1.8rem; /* Hacer el icono más grande */
         border: none;
         cursor: pointer;
         border-radius: 0.6rem;
+        font-weight: bold; /* Para que el símbolo "☰" sea más grueso */
+        line-height: 1; /* Asegurar que el tamaño del texto no añada espacio extra */
     }
     .dropbtn:hover {
         background-color: #6a92b0;
@@ -354,7 +355,6 @@
 </head>
 <body>
   <div class="fixed-header">
-    <h1>Mi Plan Fit 📱</h1>
     <div class="menu-right">
       <label class="dark-mode-label" for="darkModeToggle">Modo Oscuro</label>
       <label class="switch">
@@ -363,9 +363,7 @@
       </label>
 
       <div class="dropdown">
-        <button class="dropbtn">☰ Opciones</button>
-        <div class="dropdown-content">
-            <a href="#" onclick="confirmClearPeso(); hideDropdown(this);">🗑️ Borrar Historial Peso</a>
+        <button class="dropbtn" id="dropdownBtn">☰</button> <div class="dropdown-content" id="dropdownContent"> <a href="#" onclick="confirmClearPeso(); hideDropdown(this);">🗑️ Borrar Historial Peso</a>
             <a href="#" onclick="confirmClearCurrentEjercicios(); hideDropdown(this);">🗑️ Borrar Ejercicios Tabla Actual</a>
             <a href="#" onclick="confirmClearAllExerciseHistory(); hideDropdown(this);">🗑️ Borrar Todo Historial Ejercicios</a>
             <hr style="border-color: var(--border);">
@@ -375,6 +373,8 @@
       </div>
     </div>
   </div>
+
+  <h1 class="app-title">Mi Plan Fit 📱</h1>
 
   <input type="file" id="importFileInput" style="display: none;" accept=".json">
 
@@ -1054,61 +1054,88 @@
 
   function populateExerciseHistoryDropdown() {
     const select = document.getElementById("selectHistoryDate");
-    select.innerHTML = "<option value=''>Selecciona una fecha...</option>"; // Reset dropdown
-
-    // Obtener todas las fechas únicas y ordenarlas de más reciente a más antigua
-    const uniqueDates = [...new Set(ejerciciosSesiones.map(s => s.fecha))].sort((a, b) => {
-        const [dayA, monthA, yearA] = a.split('/');
+    select.innerHTML = ""; // Limpiar opciones anteriores
+    // Ordenar sesiones por fecha (más reciente primero)
+    const sortedSessions = [...ejerciciosSesiones].sort((a, b) => {
+        const [dayA, monthA, yearA] = a.fecha.split('/');
         const dateA = new Date(`${yearA}-${monthA}-${dayA}`);
-        const [dayB, monthB, yearB] = b.split('/');
+        const [dayB, monthB, yearB] = b.fecha.split('/');
         const dateB = new Date(`${yearB}-${monthB}-${dayB}`);
-        return dateB - dateA; // Ordenar de forma descendente (más reciente primero)
+        return dateB - dateA; // Para ordenar de más reciente a más antigua
     });
 
-    uniqueDates.forEach(date => {
+    if (sortedSessions.length === 0) {
         const option = document.createElement("option");
-        option.value = date;
-        option.textContent = date;
+        option.value = "";
+        option.textContent = "No hay sesiones guardadas";
         select.appendChild(option);
+        document.getElementById("exerciseHistoryDisplay").innerHTML = "<p>No hay historial de sesiones para mostrar.</p>";
+        return;
+    }
+
+    sortedSessions.forEach(session => {
+      const option = document.createElement("option");
+      option.value = session.fecha;
+      option.textContent = session.fecha;
+      select.appendChild(option);
     });
 
-    // Si hay historial, mostrar la última sesión automáticamente
-    if (uniqueDates.length > 0) {
-        select.value = uniqueDates[0];
-        displaySelectedExerciseSession();
-    } else {
-        document.getElementById("exerciseHistoryDisplay").innerHTML = "<p>No hay sesiones de ejercicio guardadas.</p>";
-    }
+    // Seleccionar y mostrar la sesión más reciente por defecto
+    select.value = sortedSessions[0].fecha;
+    displaySelectedExerciseSession();
   }
 
   function displaySelectedExerciseSession() {
-    const select = document.getElementById("selectHistoryDate");
-    const selectedDate = select.value;
+    const selectedDate = document.getElementById("selectHistoryDate").value;
     const displayDiv = document.getElementById("exerciseHistoryDisplay");
     displayDiv.innerHTML = "";
 
-    if (!selectedDate) {
-      displayDiv.innerHTML = "<p>Selecciona una fecha para ver la sesión.</p>";
-      return;
-    }
-
     const session = ejerciciosSesiones.find(s => s.fecha === selectedDate);
-
-    if (session && session.ejercicios && session.ejercicios.length > 0) {
-      let html = `<p><b>Ejercicios del ${selectedDate}:</b></p>`;
-      html += `<table class="exercise-history-table"><thead><tr><th>Ejercicio</th><th>Series</th><th>Peso (kg)</th><th>Notas</th></tr></thead><tbody>`; // Removed RPE header
+    if (session) {
+      let html = `<h3 class="exercise-history-table">Sesión del ${session.fecha}</h3>`;
+      html += `
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr><th>Ejercicio</th><th>Series</th><th>Peso (kg)</th><th>Notas</th></tr>
+                </thead>
+                <tbody>
+      `;
       session.ejercicios.forEach(ej => {
-        html += `<tr><td>${ej.nombre}</td><td>${ej.series}</td><td>${ej.peso}</td><td>${ej.notas || ''}</td></tr>`; // Removed RPE cell
+        html += `
+          <tr>
+            <td>${ej.nombre}</td>
+            <td>${ej.series}</td>
+            <td>${ej.peso}</td>
+            <td>${ej.notas || '-'}</td>
+          </tr>
+        `;
       });
-      html += `</tbody></table>`;
+      html += `
+                </tbody>
+            </table>
+        </div>
+        <button class="button-danger small-btn" onclick="confirmDeleteSession('${session.fecha}')">🗑️ Borrar Sesión</button>
+      `;
       displayDiv.innerHTML = html;
     } else {
-      displayDiv.innerHTML = `<p>No se encontraron ejercicios para el ${selectedDate}.</p>`;
+      displayDiv.innerHTML = "<p>No se encontraron datos para la fecha seleccionada.</p>";
+    }
+  }
+
+  function confirmDeleteSession(dateToDelete) {
+    if (confirm(`¿Estás seguro de que quieres borrar la sesión de ejercicios del ${dateToDelete}? Esta acción es irreversible.`)) {
+      ejerciciosSesiones = ejerciciosSesiones.filter(s => s.fecha !== dateToDelete);
+      localStorage.setItem("ejercicios_sesiones", JSON.stringify(ejerciciosSesiones));
+      populateExerciseHistoryDropdown();
+      populateExerciseChartDropdown(); // Actualizar el select de gráficos
+      updateExerciseChart(); // Refrescar el gráfico si el ejercicio borrado era el seleccionado
+      alert("Sesión borrada.");
     }
   }
 
   function confirmClearAllExerciseHistory() {
-    if (confirm("¿Estás seguro de que quieres borrar *TODO* el historial de sesiones de ejercicio? Esta acción es irreversible.")) {
+    if (confirm("¿Estás seguro de que quieres borrar TODO el historial de sesiones de ejercicios? Esta acción es irreversible.")) {
       clearAllExerciseHistory();
     }
   }
@@ -1117,191 +1144,147 @@
     localStorage.removeItem("ejercicios_sesiones");
     ejerciciosSesiones = [];
     populateExerciseHistoryDropdown();
-    populateExerciseChartDropdown(); // Limpiar el dropdown de gráficos también
-    updateExerciseChart(); // Borrar el gráfico de ejercicios
-    alert("Todo el historial de sesiones de ejercicio ha sido borrado.");
+    populateExerciseChartDropdown(); // Limpiar también el select del gráfico
+    updateExerciseChart(); // Limpiar el gráfico
+    alert("Todo el historial de ejercicios ha sido borrado.");
   }
 
-  // --- Temporizador de Descanso ---
+
+  // --- Temporizador ---
   let timerInterval;
-  let timeLeft = 0;
+  let timeLeft;
   const countdownDisplay = document.getElementById('countdownDisplay');
-  const restTimeInput = document.getElementById('restTime');
   const timerStartBtn = document.getElementById('timerStartBtn');
   const timerResetBtn = document.getElementById('timerResetBtn');
 
   function startTimer() {
-    const duration = parseInt(restTimeInput.value);
+    const minutesInput = document.getElementById('restTime');
+    let duration = parseInt(minutesInput.value, 10);
+
     if (isNaN(duration) || duration <= 0) {
-      alert("Por favor, introduce un tiempo de descanso válido (en segundos).");
+      alert('Por favor, introduce un tiempo de descanso válido en segundos.');
       return;
     }
+
     timeLeft = duration;
-    updateTimerDisplay();
     timerStartBtn.style.display = 'none';
     timerResetBtn.style.display = 'inline-block';
-    restTimeInput.disabled = true;
+    minutesInput.disabled = true; // Deshabilitar input mientras corre el temporizador
 
+    clearInterval(timerInterval); // Limpiar cualquier intervalo anterior
     timerInterval = setInterval(() => {
-      timeLeft--;
-      updateTimerDisplay();
       if (timeLeft <= 0) {
         clearInterval(timerInterval);
-        countdownDisplay.innerText = "¡Listo!";
+        countdownDisplay.innerText = '¡Tiempo!';
         timerStartBtn.style.display = 'inline-block';
         timerResetBtn.style.display = 'none';
-        restTimeInput.disabled = false;
-        // Opcional: vibrar o reproducir sonido
-        if ('vibrate' in navigator) {
-            navigator.vibrate(200); // Vibrate for 200ms
-        }
+        minutesInput.disabled = false; // Habilitar input
+        new Audio('https://www.soundjay.com/buttons/beep-07a.mp3').play(); // Reproducir sonido
+      } else {
+        countdownDisplay.innerText = formatTime(timeLeft);
+        timeLeft--;
       }
     }, 1000);
   }
 
-  function updateTimerDisplay() {
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    countdownDisplay.innerText = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-  }
-
   function resetTimer() {
     clearInterval(timerInterval);
-    timeLeft = 0;
-    updateTimerDisplay();
+    countdownDisplay.innerText = '';
+    document.getElementById('restTime').disabled = false; // Habilitar input
     timerStartBtn.style.display = 'inline-block';
     timerResetBtn.style.display = 'none';
-    restTimeInput.disabled = false;
-    countdownDisplay.innerText = ""; // Clear display
   }
 
-  // --- Gestión de Datos ---
+  function formatTime(seconds) {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  }
+
+
+  // --- Import/Export ---
   function exportData() {
     const data = {
       peso_historial: JSON.parse(localStorage.getItem("peso_historial") || "[]"),
       ejercicios_sesiones: JSON.parse(localStorage.getItem("ejercicios_sesiones") || "[]"),
       planEntrenamiento: JSON.parse(localStorage.getItem("planEntrenamiento") || "{}"),
-      current_session_exercises: JSON.parse(localStorage.getItem("current_session_exercises") || "[]"),
+      last_progress_photo: localStorage.getItem("last_progress_photo"),
       darkMode: localStorage.getItem("darkMode"),
-      last_progress_photo: localStorage.getItem("last_progress_photo")
+      // Incluir cualquier otra clave de localStorage relevante si es necesario
     };
-
-    const filename = `mi_plan_fit_backup_${new Date().toISOString().slice(0,10)}.json`;
-    const jsonStr = JSON.stringify(data, null, 2); // null, 2 para formato legible
-    const blob = new Blob([jsonStr], { type: "application/json" });
+    const dataStr = JSON.stringify(data, null, 2);
+    const blob = new Blob([dataStr], { type: "application/json" });
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = filename;
+    a.download = "mi_plan_fit_data.json";
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-
-    const dataMessage = document.getElementById("dataMessage");
-    // dataMessage might be hidden now due to menu structure, show it programmatically
-    if (!dataMessage) { // Create if not present in main body
-        const newMsgDiv = document.createElement('div');
-        newMsgDiv.id = 'dataMessage';
-        newMsgDiv.className = 'message success';
-        newMsgDiv.style.display = 'block';
-        newMsgDiv.innerText = "Datos exportados correctamente.";
-        document.body.appendChild(newMsgDiv);
-        setTimeout(() => { newMsgDiv.remove(); }, 3000);
-    } else {
-        dataMessage.innerText = "Datos exportados correctamente.";
-        dataMessage.className = "message success";
-        dataMessage.style.display = "block";
-        setTimeout(() => { dataMessage.style.display = "none"; }, 3000);
-    }
+    alert("Datos exportados correctamente.");
   }
 
-  document.getElementById('importFileInput').addEventListener('change', function(event) {
+  document.getElementById('importFileInput').addEventListener('change', (event) => {
     const file = event.target.files[0];
-    if (!file) return;
-
-    if (confirm("ADVERTENCIA: ¿Estás seguro de que quieres importar datos? Esto SOBRESCRIBIRÁ todos tus datos actuales de peso, ejercicios y configuración. Esta acción es irreversible.")) {
+    if (file) {
       const reader = new FileReader();
       reader.onload = function(e) {
         try {
           const importedData = JSON.parse(e.target.result);
-          if (importedData.peso_historial) localStorage.setItem("peso_historial", JSON.stringify(importedData.peso_historial));
-          if (importedData.ejercicios_sesiones) localStorage.setItem("ejercicios_sesiones", JSON.stringify(importedData.ejercicios_sesiones));
-          if (importedData.planEntrenamiento) localStorage.setItem("planEntrenamiento", JSON.stringify(importedData.planEntrenamiento));
-          if (importedData.current_session_exercises) localStorage.setItem("current_session_exercises", JSON.stringify(importedData.current_session_exercises));
-          if (importedData.darkMode !== undefined) localStorage.setItem("darkMode", importedData.darkMode);
-          if (importedData.last_progress_photo !== undefined) localStorage.setItem("last_progress_photo", importedData.last_progress_photo);
-
-          // Recargar todos los elementos de la UI para reflejar los datos importados
-          cargarChecks();
-          planEntrenamientoIndex = JSON.parse(localStorage.getItem("planEntrenamiento") || "{}"); // Actualizar global
-          cargarEjerciciosDias();
-          pesos = JSON.parse(localStorage.getItem("peso_historial") || "[]"); // Actualizar global
-          displayPesoHistory();
-          updateWeightChart();
-          ejerciciosSesiones = JSON.parse(localStorage.getItem("ejercicios_sesiones") || "[]"); // Actualizar global
-          populateExerciseChartDropdown();
-          populateExerciseHistoryDropdown();
-          cargarEjerciciosTablaActual();
-          displayLastPhoto();
-          setDarkMode(localStorage.getItem('darkMode') === 'enabled'); // Apply dark mode if imported
-
-          const dataMessage = document.getElementById("dataMessage");
-           if (!dataMessage) { // Create if not present in main body
-                const newMsgDiv = document.createElement('div');
-                newMsgDiv.id = 'dataMessage';
-                newMsgDiv.className = 'message success';
-                newMsgDiv.style.display = 'block';
-                newMsgDiv.innerText = "Datos importados correctamente. La aplicación se ha actualizado.";
-                document.body.appendChild(newMsgDiv);
-                setTimeout(() => { newMsgDiv.remove(); }, 5000);
-            } else {
-                dataMessage.innerText = "Datos importados correctamente. La aplicación se ha actualizado.";
-                dataMessage.className = "message success";
-                dataMessage.style.display = "block";
-                setTimeout(() => { dataMessage.style.display = "none"; }, 5000);
+          if (confirm("¿Estás seguro de que quieres importar estos datos? Esto sobrescribirá tus datos actuales.")) {
+            // Importar cada sección de datos
+            if (importedData.peso_historial) localStorage.setItem("peso_historial", JSON.stringify(importedData.peso_historial));
+            if (importedData.ejercicios_sesiones) localStorage.setItem("ejercicios_sesiones", JSON.stringify(importedData.ejercicios_sesiones));
+            if (importedData.planEntrenamiento) localStorage.setItem("planEntrenamiento", JSON.stringify(importedData.planEntrenamiento));
+            if (importedData.last_progress_photo) localStorage.setItem("last_progress_photo", importedData.last_progress_photo);
+            // Si el modo oscuro está en los datos importados, aplicarlo
+            if (importedData.darkMode) {
+              localStorage.setItem("darkMode", importedData.darkMode);
+              setDarkMode(importedData.darkMode === 'enabled');
+              darkModeToggle.checked = (importedData.darkMode === 'enabled');
             }
-
-        } catch (e) {
-          alert("Error al importar el archivo. Asegúrate de que sea un archivo JSON válido de respaldo.");
-          console.error("Error importing file:", e);
-          const dataMessage = document.getElementById("dataMessage");
-          if (!dataMessage) { // Create if not present in main body
-                const newMsgDiv = document.createElement('div');
-                newMsgDiv.id = 'dataMessage';
-                newMsgDiv.className = 'message error';
-                newMsgDiv.style.display = 'block';
-                newMsgDiv.innerText = "Error al importar datos.";
-                document.body.appendChild(newMsgDiv);
-                setTimeout(() => { newMsgDiv.remove(); }, 3000);
-            } else {
-                dataMessage.innerText = "Error al importar datos.";
-                dataMessage.className = "message error";
-                dataMessage.style.display = "block";
-                setTimeout(() => { dataMessage.style.display = "none"; }, 3000);
-            }
-        } finally {
-            event.target.value = ''; // Clear the file input if user cancels to allow re-selection of the same file
+            
+            // Recargar toda la UI para reflejar los nuevos datos
+            location.reload(); 
+            alert("Datos importados correctamente. La página se recargará.");
+          }
+        } catch (error) {
+          alert("Error al importar el archivo. Asegúrate de que sea un archivo JSON válido.");
+          console.error("Error importing file:", error);
         }
       };
       reader.readAsText(file);
     } else {
-        event.target.value = ''; // Clear the file input if user cancels to allow re-selection of the same file
-    }
+        // Clear the file input if user cancels to allow re-selection of the same file
+        event.target.value = ''; 
+      }
   });
 
-  // Function to hide dropdown after click
-  function hideDropdown(element) {
-    // Find the parent dropdown-content and set its display to none
-    let parent = element.closest('.dropdown-content');
-    if (parent) {
-      parent.style.display = 'none';
-    }
+
+  // --- Dropdown Toggle Logic (New) ---
+  const dropdownBtn = document.getElementById("dropdownBtn");
+  const dropdownContent = document.getElementById("dropdownContent");
+
+  dropdownBtn.addEventListener("click", function(event) {
+      event.stopPropagation(); // Prevenir que el clic en el botón se propague al documento
+      dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
+  });
+
+  // Cerrar el dropdown si se hace clic fuera de él
+  document.addEventListener("click", function(event) {
+      if (!dropdownContent.contains(event.target) && event.target !== dropdownBtn) {
+          dropdownContent.style.display = "none";
+      }
+  });
+
+  // Función auxiliar para ocultar el dropdown después de una acción
+  function hideDropdown() {
+      dropdownContent.style.display = "none";
   }
 
 
-  // --- Inicialización al Cargar la Página ---
-  document.addEventListener('DOMContentLoaded', () => {
+  // --- Inicialización al Cargar la Página ---\r\n  document.addEventListener('DOMContentLoaded', () => {
     cargarChecks();
     
     planEntrenamientoIndex = JSON.parse(localStorage.getItem("planEntrenamiento") || "{}");
@@ -1332,7 +1315,6 @@
         });
     });
   }
-
 </script>
 </body>
 </html>
