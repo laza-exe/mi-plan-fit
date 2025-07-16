@@ -217,11 +217,18 @@
         margin-bottom: 8px;
         display: flex;
         align-items: center;
+        cursor: pointer; /* Make it clear it's clickable */
+        transition: background-color 0.2s;
+    }
+
+    .current-day-exercises p:hover {
+        background-color: var(--border);
     }
 
     .current-day-exercises p input[type="checkbox"] {
         margin-right: 10px;
         transform: scale(1.2);
+        pointer-events: none; /* Prevent direct interaction, managed by script */
     }
 
     .current-day-exercises h3 {
@@ -478,6 +485,7 @@
     let userHeight = null; // Altura del usuario en metros
     let weightChartInstance = null; // Instancia del gráfico de peso
     let exerciseChartInstance = null; // Instancia del gráfico de ejercicio
+    let selectedPlannedExercise = null; // Almacena el ejercicio planificado seleccionado para edición/actualización
 
     // --- Selectores DOM ---
     const currentDayDisplay = document.getElementById('currentDayDisplay');
@@ -593,6 +601,16 @@
                                         ` (${ejercicio.sets}x${ejercicio.reps} @ ${ejercicio.weight}kg)` : '';
                 p.innerHTML = `<input type="checkbox" id="${checkboxId}" data-day="${currentDay + 1}" data-exercise-name="${ejercicio.name}" />
                                <label for="${checkboxId}">${ejercicio.name}${exerciseDetails}</label>`;
+                
+                // Add data attributes for pre-filling inputs and tracking original exercise
+                p.dataset.dayKey = dayKey;
+                p.dataset.exerciseIndex = index;
+                p.dataset.exerciseName = ejercicio.name;
+                p.dataset.exerciseSets = ejercicio.sets;
+                p.dataset.exerciseReps = ejercicio.reps;
+                p.dataset.exerciseWeight = ejercicio.weight;
+                p.dataset.exerciseNotes = ejercicio.notes || ''; // Include notes for pre-filling
+
                 currentDayExercisesDiv.appendChild(p);
             });
         } else {
@@ -633,6 +651,31 @@
         localStorage.setItem("currentDayIndex", currentDay); // Guardar el día actual
         resetDailySession(); // Resetear sesión temporal al cambiar de día
     });
+
+    // --- Event Listener para seleccionar ejercicios del plan diario ---
+    currentDayExercisesDiv.addEventListener('click', (event) => {
+        const clickedP = event.target.closest('p');
+        if (clickedP && clickedP.dataset.dayKey && clickedP.dataset.exerciseIndex) {
+            // Store the planned exercise's details
+            selectedPlannedExercise = {
+                dayKey: clickedP.dataset.dayKey,
+                index: parseInt(clickedP.dataset.exerciseIndex),
+                originalName: clickedP.dataset.exerciseName,
+                originalSets: parseInt(clickedP.dataset.exerciseSets),
+                originalReps: parseInt(clickedP.dataset.exerciseReps),
+                originalWeight: parseFloat(clickedP.dataset.exerciseWeight),
+                originalNotes: clickedP.dataset.exerciseNotes
+            };
+
+            // Pre-fill the input fields
+            exerciseNameInput.value = selectedPlannedExercise.originalName;
+            exerciseSetsInput.value = selectedPlannedExercise.originalSets;
+            exerciseRepsInput.value = selectedPlannedExercise.originalReps;
+            exerciseWeightInput.value = selectedPlannedExercise.originalWeight;
+            exerciseNotesInput.value = selectedPlannedExercise.originalNotes;
+        }
+    });
+
 
     // --- Añadir Ejercicio a la Sesión Actual ---
     addExerciseBtn.addEventListener('click', () => {
@@ -687,6 +730,38 @@
         }
         
         alert('Ejercicio añadido/actualizado a la sesión actual!');
+
+        // --- Preguntar al usuario si desea actualizar el plan si los valores cambiaron ---
+        if (selectedPlannedExercise && selectedPlannedExercise.originalName === name) {
+            const original = selectedPlannedExercise;
+            const updated = newExercise;
+
+            if (original.originalSets !== updated.sets || 
+                original.originalReps !== updated.reps || 
+                original.originalWeight !== updated.weight) {
+                
+                const confirmUpdate = confirm(
+                    `Has registrado este ejercicio con valores diferentes a los planificados.\n\n` +
+                    `Planificado: ${original.originalSets}x${original.originalReps} @ ${original.originalWeight}kg\n` +
+                    `Registrado: ${updated.sets}x${updated.reps} @ ${updated.weight}kg\n\n` +
+                    `¿Deseas actualizar los valores planificados para "${name}" en tu plan semanal con los valores que acabas de registrar?`
+                );
+
+                if (confirmUpdate) {
+                    const dayPlan = planEntrenamientoIndex[original.dayKey];
+                    if (dayPlan && dayPlan.ejercicios && dayPlan.ejercicios[original.index]) {
+                        dayPlan.ejercicios[original.index].sets = updated.sets;
+                        dayPlan.ejercicios[original.index].reps = updated.reps;
+                        dayPlan.ejercicios[original.index].weight = updated.weight;
+                        dayPlan.ejercicios[original.index].notes = updated.notes; // También actualizar notas
+                        savePlan();
+                        cargarEjerciciosDias(); // Recargar para mostrar los valores actualizados en el plan
+                        alert("¡Plan semanal actualizado!");
+                    }
+                }
+            }
+            selectedPlannedExercise = null; // Resetear la selección después de usarla
+        }
         
         // Limpiar campos para el siguiente ejercicio
         exerciseNameInput.value = '';
@@ -1164,8 +1239,6 @@
         
         displayLastPhoto(); // Mostrar la última foto guardada
         
-        // Ya no necesitamos un event listener para los checkboxes individuales,
-        // ya que su estado ahora se gestiona automáticamente al añadir ejercicios a la sesión.
     });
 
     // Service Worker Registration
