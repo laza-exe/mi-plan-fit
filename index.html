@@ -267,6 +267,15 @@
         align-items: center;
         font-weight: normal;
     }
+
+    /* NUEVOS ESTILOS PARA EL CONTENEDOR DEL GRÁFICO DE PESO */
+    .chart-container {
+        position: relative; /* Necesario para que el canvas se ajuste al contenedor */
+        height: 300px; /* Altura fija para el gráfico */
+        max-height: 50vh; /* Altura máxima relativa al viewport */
+        width: 100%; /* Ocupa todo el ancho disponible */
+        margin-bottom: 20px; /* Espacio debajo del gráfico */
+    }
   </style>
 </head>
 <body>
@@ -314,7 +323,9 @@
   <div class="section">
     <h2>📊 Gráficos de Progreso</h2>
     <h3>Evolución del Peso</h3>
-    <canvas id="weightChart"></canvas>
+    <div class="chart-container">
+        <canvas id="weightChart"></canvas>
+    </div>
 
     <h3 style="margin-top: 1.5rem;">Progreso de Ejercicio Específico</h3>
     <select id="exerciseChartSelect" onchange="updateExerciseChart()">
@@ -635,7 +646,7 @@
           },
           options: {
               responsive: true,
-              maintainAspectRatio: false,
+              maintainAspectRatio: false, // ¡IMPORTANTE para que el CSS controle la altura!
               scales: {
                   y: {
                       beginAtZero: false,
@@ -649,7 +660,10 @@
                       },
                       grid: {
                           color: getComputedStyle(document.documentElement).getPropertyValue('--border').trim()
-                      }
+                      },
+                      // ¡AÑADIDO PARA FIJAR EL RANGO DEL EJE Y!
+                      min: 50, 
+                      max: 150 
                   },
                   x: {
                       title: {
