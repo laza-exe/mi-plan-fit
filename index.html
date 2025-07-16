@@ -399,10 +399,11 @@
         </div>
       <div class="form-group">
         <label for="exerciseName">Nombre del Ejercicio:</label>
-        <input type="text" id="exerciseName" placeholder="Ej. Sentadilla" />
+        <input type="text" id="exerciseName" list="exerciseSuggestions" placeholder="Buscar o seleccionar ejercicio" />
+        <datalist id="exerciseSuggestions"></datalist>
         <label for="exerciseSets">Series:</label>
         <input type="number" id="exerciseSets" placeholder="Ej. 3" min="1"/>
-        <label for="exerciseReps">Repeticiones:</label>
+        <label for="exerciseReps">Repeticiones: <span id="exerciseRepsUnit">reps</span></label>
         <input type="number" id="exerciseReps" placeholder="Ej. 10" min="1"/>
         <label for="exerciseWeight">Peso (kg):</label>
         <input type="number" id="exerciseWeight" placeholder="Ej. 50" step="0.1"/>
@@ -486,6 +487,35 @@
     let weightChartInstance = null; // Instancia del gráfico de peso
     let exerciseChartInstance = null; // Instancia del gráfico de ejercicio
     let selectedPlannedExercise = null; // Almacena el ejercicio planificado seleccionado para edición/actualización
+    let masterExercises = []; // Master list of exercises, will be loaded from localStorage or initialized
+
+    // Define the initial master exercise list with default units
+    const initialMasterExerciseList = [
+        { name: "Press de Banca", sets: 3, reps: 10, weight: 50, unit: "reps" },
+        { name: "Sentadilla", sets: 4, reps: 8, weight: 60, unit: "reps" },
+        { name: "Peso Muerto", sets: 3, reps: 5, weight: 80, unit: "reps" },
+        { name: "Dominadas", sets: 3, reps: 8, weight: 0, unit: "reps" },
+        { name: "Remo con Barra", sets: 3, reps: 10, weight: 40, unit: "reps" },
+        { name: "Press Militar", sets: 3, reps: 10, weight: 30, unit: "reps" },
+        { name: "Elevaciones Laterales", sets: 3, reps: 15, weight: 5, unit: "reps" },
+        { name: "Pájaros", sets: 3, reps: 15, weight: 5, unit: "reps" },
+        { name: "Face Pull", sets: 3, reps: 15, weight: 10, unit: "reps" },
+        { name: "Plancha", sets: 3, reps: 60, weight: 0, unit: "segundos" }, // Reps como segundos
+        { name: "Crunch", sets: 3, reps: 20, weight: 0, unit: "reps" },
+        { name: "Elevación de Piernas", sets: 3, reps: 15, weight: 0, unit: "reps" },
+        { name: "Hollow Hold", sets: 3, reps: 30, weight: 0, unit: "segundos" }, // Reps como segundos
+        { name: "Bird-dog", sets: 3, reps: 12, weight: 0, unit: "reps" },
+        { name: "Caminata Inclinada", sets: 1, reps: 30, weight: 0, unit: "minutos" }, // Reps como minutos
+        { name: "Burpees", sets: 3, reps: 10, weight: 0, unit: "reps" },
+        { name: "Saltos de Caja", sets: 3, reps: 10, weight: 0, unit: "reps" },
+        { name: "Sentadilla Búlgara", sets: 3, reps: 10, weight: 10, unit: "reps" },
+        { name: "Hip Thrust", sets: 3, reps: 3, weight: 60, unit: "reps" },
+        { name: "Press Francés", sets: 3, reps: 12, weight: 20, unit: "reps" },
+        { name: "Extensiones de Tríceps en Polea", sets: 3, reps: 15, weight: 15, unit: "reps" },
+        { name: "Curl de Bíceps con Barra", sets: 3, reps: 12, weight: 25, unit: "reps" },
+        { name: "Curl de Martillo", sets: 3, reps: 12, weight: 10, unit: "reps" },
+        { name: "Elevación de Gemelos", sets: 4, reps: 15, weight: 30, unit: "reps" }
+    ];
 
     // --- Selectores DOM ---
     const currentDayDisplay = document.getElementById('currentDayDisplay');
@@ -495,6 +525,8 @@
     const prevDayBtn = document.getElementById('prevDayBtn');
     const nextDayBtn = document.getElementById('nextDayBtn');
     const exerciseNameInput = document.getElementById('exerciseName');
+    const exerciseDatalist = document.getElementById('exerciseSuggestions'); // New datalist element
+    const exerciseRepsUnitSpan = document.getElementById('exerciseRepsUnit'); // New span for reps unit
     const exerciseSetsInput = document.getElementById('exerciseSets');
     const exerciseRepsInput = document.getElementById('exerciseReps');
     const exerciseWeightInput = document.getElementById('exerciseWeight');
@@ -555,6 +587,9 @@
         dailySessionExercises = JSON.parse(localStorage.getItem(key)) || [];
     }
 
+    function saveMasterExercises() {
+        localStorage.setItem("masterExercises", JSON.stringify(masterExercises));
+    }
 
     // Cargar datos de localStorage
     function loadData() {
@@ -564,6 +599,12 @@
         userHeight = JSON.parse(localStorage.getItem("user_height")) || null;
         if (userHeight) {
             userHeightInput.value = userHeight;
+        }
+
+        masterExercises = JSON.parse(localStorage.getItem("masterExercises"));
+        if (!masterExercises || masterExercises.length === 0) {
+            masterExercises = initialMasterExerciseList;
+            saveMasterExercises();
         }
     }
 
@@ -581,7 +622,6 @@
     }
 
     // --- Funciones para el Plan de Entrenamiento ---
-
     // Cargar ejercicios para el día actual
     function cargarEjerciciosDias() {
         const daysOfWeek = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
@@ -596,11 +636,10 @@
             dayPlan.ejercicios.forEach((ejercicio, index) => {
                 const p = document.createElement('p');
                 const checkboxId = `checkbox-dia-${currentDay + 1}-ejercicio-${index}`;
-                // Mostrar detalles del ejercicio si están disponibles
+                // Display details including unit
                 const exerciseDetails = ejercicio.sets && ejercicio.reps && ejercicio.weight !== undefined ?
-                                        ` (${ejercicio.sets}x${ejercicio.reps} @ ${ejercicio.weight}kg)` : '';
-                p.innerHTML = `<input type="checkbox" id="${checkboxId}" data-day="${currentDay + 1}" data-exercise-name="${ejercicio.name}" />
-                               <label for="${checkboxId}">${ejercicio.name}${exerciseDetails}</label>`;
+                    ` (${ejercicio.sets}x${ejercicio.reps} @ ${ejercicio.weight}kg, ${ejercicio.unit || 'reps'})` : '';
+                p.innerHTML = `<input type="checkbox" id="${checkboxId}" data-day="${currentDay + 1}" data-exercise-name="${ejercicio.name}" /> <label for="${checkboxId}">${ejercicio.name}${exerciseDetails}</label>`;
                 
                 // Add data attributes for pre-filling inputs and tracking original exercise
                 p.dataset.dayKey = dayKey;
@@ -609,8 +648,9 @@
                 p.dataset.exerciseSets = ejercicio.sets;
                 p.dataset.exerciseReps = ejercicio.reps;
                 p.dataset.exerciseWeight = ejercicio.weight;
-                p.dataset.exerciseNotes = ejercicio.notes || ''; // Include notes for pre-filling
-
+                p.dataset.exerciseNotes = ejercicio.notes || '';
+                p.dataset.exerciseUnit = ejercicio.unit || 'reps'; // Store the unit
+                
                 currentDayExercisesDiv.appendChild(p);
             });
         } else {
@@ -639,6 +679,36 @@
         cargarEjerciciosDias(); // Recargar para limpiar los checks
     }
 
+    // Populate the datalist from masterExercises
+    function populateExerciseDatalist() {
+        exerciseDatalist.innerHTML = ''; // Clear existing options
+        masterExercises.forEach(exercise => {
+            const option = document.createElement('option');
+            option.value = exercise.name;
+            exerciseDatalist.appendChild(option);
+        });
+    }
+
+    // Event listener for when an exercise is selected or typed in index.html
+    exerciseNameInput.addEventListener('input', () => {
+        const selectedExerciseName = exerciseNameInput.value.trim();
+        const selectedExercise = masterExercises.find(ex => ex.name.toLowerCase() === selectedExerciseName.toLowerCase());
+
+        if (selectedExercise) {
+            exerciseSetsInput.value = selectedExercise.sets;
+            exerciseRepsInput.value = selectedExercise.reps;
+            exerciseWeightInput.value = selectedExercise.weight;
+            exerciseRepsUnitSpan.textContent = selectedExercise.unit || 'reps'; // Update the unit display
+        } else {
+            // Clear default values and reset unit if no matching exercise is found
+            exerciseSetsInput.value = '';
+            exerciseRepsInput.value = '';
+            exerciseWeightInput.value = '';
+            exerciseRepsUnitSpan.textContent = 'reps'; // Reset unit
+        }
+    });
+
+
     // --- Event Listeners para Navegación de Días ---
     prevDayBtn.addEventListener('click', () => {
         currentDay = (currentDay - 1 + 7) % 7; // Ir al día anterior, ciclando
@@ -664,7 +734,8 @@
                 originalSets: parseInt(clickedP.dataset.exerciseSets),
                 originalReps: parseInt(clickedP.dataset.exerciseReps),
                 originalWeight: parseFloat(clickedP.dataset.exerciseWeight),
-                originalNotes: clickedP.dataset.exerciseNotes
+                originalNotes: clickedP.dataset.exerciseNotes,
+                originalUnit: clickedP.dataset.exerciseUnit || 'reps' // Retrieve the unit
             };
 
             // Pre-fill the input fields
@@ -673,9 +744,9 @@
             exerciseRepsInput.value = selectedPlannedExercise.originalReps;
             exerciseWeightInput.value = selectedPlannedExercise.originalWeight;
             exerciseNotesInput.value = selectedPlannedExercise.originalNotes;
+            exerciseRepsUnitSpan.textContent = selectedPlannedExercise.originalUnit; // Update unit display
         }
     });
-
 
     // --- Añadir Ejercicio a la Sesión Actual ---
     addExerciseBtn.addEventListener('click', () => {
@@ -684,6 +755,7 @@
         const reps = parseInt(exerciseRepsInput.value);
         const weight = parseFloat(exerciseWeightInput.value);
         const notes = exerciseNotesInput.value.trim();
+        const unit = exerciseRepsUnitSpan.textContent; // Get the current unit displayed
 
         if (!name) {
             alert("Por favor, introduce el nombre del ejercicio.");
@@ -709,7 +781,8 @@
             sets: sets,
             reps: reps,
             weight: weight,
-            notes: notes
+            notes: notes,
+            unit: unit // Store the unit
         };
 
         // Añadir a la sesión temporal
@@ -728,7 +801,6 @@
             checkbox.checked = true;
             checkbox.disabled = true;
         }
-        
         alert('Ejercicio añadido/actualizado a la sesión actual!');
 
         // --- Preguntar al usuario si desea actualizar el plan si los valores cambiaron ---
@@ -736,248 +808,150 @@
             const original = selectedPlannedExercise;
             const updated = newExercise;
 
-            if (original.originalSets !== updated.sets || 
-                original.originalReps !== updated.reps || 
-                original.originalWeight !== updated.weight) {
-                
+            if (original.originalSets !== updated.sets || original.originalReps !== updated.reps || original.originalWeight !== updated.weight || original.originalUnit !== updated.unit) {
                 const confirmUpdate = confirm(
                     `Has registrado este ejercicio con valores diferentes a los planificados.\n\n` +
-                    `Planificado: ${original.originalSets}x${original.originalReps} @ ${original.originalWeight}kg\n` +
-                    `Registrado: ${updated.sets}x${updated.reps} @ ${updated.weight}kg\n\n` +
-                    `¿Deseas actualizar los valores planificados para "${name}" en tu plan semanal con los valores que acabas de registrar?`
+                    `Planificado: ${original.originalSets}x${original.originalReps} @ ${original.originalWeight}kg (${original.originalUnit})\n` +
+                    `Registrado: ${updated.sets}x${updated.reps} @ ${updated.weight}kg (${updated.unit})\n\n` +
+                    `¿Deseas actualizar el plan semanal con estos nuevos valores para este ejercicio?`
                 );
 
                 if (confirmUpdate) {
-                    const dayPlan = planEntrenamientoIndex[original.dayKey];
-                    if (dayPlan && dayPlan.ejercicios && dayPlan.ejercicios[original.index]) {
-                        dayPlan.ejercicios[original.index].sets = updated.sets;
-                        dayPlan.ejercicios[original.index].reps = updated.reps;
-                        dayPlan.ejercicios[original.index].weight = updated.weight;
-                        dayPlan.ejercicios[original.index].notes = updated.notes; // También actualizar notas
-                        savePlan();
-                        cargarEjerciciosDias(); // Recargar para mostrar los valores actualizados en el plan
-                        alert("¡Plan semanal actualizado!");
-                    }
+                    const dayKey = selectedPlannedExercise.dayKey;
+                    const exerciseIndex = selectedPlannedExercise.index;
+                    planEntrenamientoIndex[dayKey].ejercicios[exerciseIndex].sets = updated.sets;
+                    planEntrenamientoIndex[dayKey].ejercicios[exerciseIndex].reps = updated.reps;
+                    planEntrenamientoIndex[dayKey].ejercicios[exerciseIndex].weight = updated.weight;
+                    planEntrenamientoIndex[dayKey].ejercicios[exerciseIndex].unit = updated.unit; // Update the unit in the plan
+                    savePlan();
+                    cargarEjerciciosDias(); // Recargar los ejercicios del día para reflejar el cambio
+                    alert("¡Plan semanal actualizado con los nuevos valores!");
                 }
             }
-            selectedPlannedExercise = null; // Resetear la selección después de usarla
         }
         
-        // Limpiar campos para el siguiente ejercicio
+        // Clear input fields after adding/updating
         exerciseNameInput.value = '';
         exerciseSetsInput.value = '';
         exerciseRepsInput.value = '';
         exerciseWeightInput.value = '';
         exerciseNotesInput.value = '';
-
-        // NO actualizar gráficos/historial aquí. Se hará en "Finalizar Día".
+        exerciseRepsUnitSpan.textContent = 'reps'; // Reset unit display
+        selectedPlannedExercise = null; // Clear selected planned exercise
     });
 
     // --- Finalizar Día de Entrenamiento ---
     finishDayBtn.addEventListener('click', () => {
         if (dailySessionExercises.length === 0) {
-            alert("No hay ejercicios registrados en la sesión actual para finalizar.");
+            alert("No has añadido ningún ejercicio a la sesión. Añade al menos uno antes de finalizar el día.");
             return;
         }
-
-        // Añadir todos los ejercicios de la sesión temporal al historial permanente
+        // Añadir todos los ejercicios temporales al historial permanente
         ejerciciosSesiones.push(...dailySessionExercises);
-        saveEjerciciosSesiones(); // Guardar el historial permanente
-
-        // Limpiar y resetear la sesión temporal para el siguiente día/uso
-        resetDailySession(); 
-        
-        alert('Día de entrenamiento finalizado! Se han guardado tus progresos.');
-        
-        // Limpiar campos de entrada de ejercicio
-        exerciseNameInput.value = '';
-        exerciseSetsInput.value = '';
-        exerciseRepsInput.value = '';
-        exerciseWeightInput.value = '';
-        exerciseNotesInput.value = '';
-
-        // Actualizar los dropdowns y gráficos
-        populateExerciseChartDropdown();
-        populateExerciseHistoryDropdown();
-        // Llamar a updateExerciseChart() y updateWeightChart() explícitamente si se desea que se muestre el último progreso automáticamente.
-        // Opcional: Si quieres que el gráfico de progreso se actualice automáticamente al finalizar el día con el último ejercicio registrado:
-        // if (ejerciciosSesiones.length > 0) {
-        //     exerciseChartSelect.value = ejerciciosSesiones[ejerciciosSesiones.length - 1].name;
-        //     updateExerciseChart();
-        // }
+        saveEjerciciosSesiones();
+        alert("¡Día de entrenamiento finalizado y ejercicios guardados en el historial!");
+        resetDailySession(); // Limpiar la sesión temporal para el siguiente día o uso
+        populateExerciseHistoryDropdown(); // Actualizar el dropdown del historial
+        // No limpiar campos de entrada aquí, ya se hace en addExerciseBtn si el usuario elige actualizar el plan
+        // o si no se ha seleccionado un ejercicio planificado.
     });
 
-    // --- Funciones para Historial de Ejercicios ---
-
-    // Llenar el dropdown con todos los ejercicios registrados
-    function populateExerciseHistoryDropdown() {
-        exerciseHistoryDropdown.innerHTML = '<option value="">Selecciona un ejercicio para ver su historial</option>';
-        const uniqueExercises = [...new Set(ejerciciosSesiones.map(ej => ej.name))];
-        uniqueExercises.sort().forEach(name => {
-            const option = document.createElement('option');
-            option.value = name;
-            option.textContent = name;
-            exerciseHistoryDropdown.appendChild(option);
-        });
-    }
-
-    // Mostrar el historial de un ejercicio seleccionado
-    exerciseHistoryDropdown.addEventListener('change', () => {
-        const selectedExerciseName = exerciseHistoryDropdown.value;
-        exerciseHistoryDisplay.innerHTML = ''; // Limpiar antes de mostrar
-
-        if (selectedExerciseName) {
-            const filteredHistory = ejerciciosSesiones
-                .filter(ej => ej.name === selectedExerciseName)
-                .sort((a, b) => new Date(b.date) - new Date(a.date)); // Ordenar por fecha descendente
-
-            if (filteredHistory.length > 0) {
-                const ul = document.createElement('ul');
-                ul.classList.add('exercise-list');
-                filteredHistory.forEach(ej => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <div class="exercise-info">
-                            <strong>${ej.date}</strong><br>
-                            Series: <span>${ej.sets}</span>, Reps: <span>${ej.reps}</span>, Peso: <span>${ej.weight}kg</span><br>
-                            Notas: <em>${ej.notes || 'N/A'}</em>
-                        </div>
-                    `;
-                    ul.appendChild(li);
-                });
-                exerciseHistoryDisplay.appendChild(ul);
-            } else {
-                exerciseHistoryDisplay.innerHTML = '<p>No hay historial para este ejercicio.</p>';
-            }
-        }
-    });
-
-    // --- Funciones para el Seguimiento de Peso e IMC ---
-
-    // Calcular IMC
-    function calculateBMI(weight, height) {
-        if (weight > 0 && height > 0) {
-            return (weight / (height * height)).toFixed(2);
-        }
-        return null;
-    }
-
-    // Interpretar IMC y mostrarlo
-    function displayBMI() {
-        const latestWeight = pesos.length > 0 ? pesos[pesos.length - 1].weight : null;
-        const height = userHeight;
-
-        bmiDisplay.className = ''; // Limpiar clases anteriores
-
-        if (latestWeight && height) {
-            const bmi = calculateBMI(latestWeight, height);
-            let interpretation = '';
-            let className = '';
-
-            if (bmi < 18.5) {
-                interpretation = 'Bajo peso';
-                className = 'underweight';
-            } else if (bmi >= 18.5 && bmi < 25) {
-                interpretation = 'Peso normal';
-                className = 'normal';
-            } else if (bmi >= 25 && bmi < 30) {
-                interpretation = 'Sobrepeso';
-                className = 'overweight';
-            } else {
-                interpretation = 'Obesidad';
-                className = 'obese';
-            }
-            bmiDisplay.innerHTML = `Tu IMC actual es: <strong>${bmi}</strong> (${interpretation}).`;
-            bmiDisplay.classList.add(className);
-
-             // Mensaje cualitativo sin dar asesoramiento médico o de peso
-             if (className === 'normal') {
-                bmiDisplay.innerHTML += '<br>Tu peso se encuentra en un rango saludable según el IMC.';
-            } else {
-                bmiDisplay.innerHTML += '<br>Considera que tu peso se encuentra fuera del rango saludable según el IMC.';
-            }
-
-        } else {
-            bmiDisplay.textContent = 'Introduce tu altura y registra tu peso para calcular el IMC.';
-        }
-    }
-
-
-    // Mostrar el historial de peso en la lista
+    // --- Funciones para Historial de Peso ---
+    // Cargar y mostrar historial de peso
     function displayPesoHistory() {
         weightHistoryList.innerHTML = '';
-        // Mostrar los últimos 10 pesos, ordenados por fecha descendente
-        const sortedPesos = [...pesos].sort((a, b) => new Date(b.date) - new Date(a.date));
-        sortedPesos.slice(0, 10).forEach(entry => {
+        pesos.sort((a, b) => new Date(b.date) - new Date(a.date)); // Ordenar por fecha, más reciente primero
+        pesos.forEach((p, index) => {
             const li = document.createElement('li');
-            li.textContent = `${entry.date}: ${entry.weight} kg`;
+            li.innerHTML = `
+                <span>${p.date}: ${p.weight} kg</span>
+                <button onclick="removeWeightEntry(${index})" class="danger">Eliminar</button>
+            `;
             weightHistoryList.appendChild(li);
         });
     }
 
-    // Evento al cambiar la altura
-    userHeightInput.addEventListener('change', () => {
-        const height = parseFloat(userHeightInput.value);
-        if (isNaN(height) || height <= 0) {
-            alert("Por favor, introduce una altura válida (en metros, mayor que 0).");
-            userHeight = null; // Resetear altura si es inválida
-            userHeightInput.value = '';
-        } else {
-            userHeight = height;
-        }
-        saveUserHeight();
-        displayBMI(); // Actualizar IMC al cambiar la altura
-    });
-
-
-    // Añadir nuevo peso
+    // Añadir peso
     addWeightBtn.addEventListener('click', () => {
         const weight = parseFloat(currentWeightInput.value);
-        const height = parseFloat(userHeightInput.value); // Obtener altura en el momento de registrar el peso
-
         if (isNaN(weight) || weight <= 0) {
             alert("Por favor, introduce un peso válido (mayor que 0).");
             return;
         }
-        if (isNaN(height) || height <= 0) {
-            alert("Por favor, introduce tu altura en metros para registrar el peso y calcular el IMC.");
-            return;
-        }
-
-        // Asegurarse de que userHeight esté actualizado antes de guardar el peso
-        userHeight = height;
-        saveUserHeight();
-
-        const date = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
-        pesos.push({ date, weight });
+        const today = new Date().toISOString().split('T')[0]; // Formato YYYY-MM-DD
+        pesos.push({ date: today, weight: weight });
         savePesos();
         displayPesoHistory();
-        updateWeightChart(); // Actualizar gráfico al añadir nuevo peso
-        displayBMI(); // Actualizar IMC al añadir nuevo peso
+        updateWeightChart();
+        displayBMI();
         currentWeightInput.value = ''; // Limpiar campo
     });
 
-    // --- Gráficos con Chart.js ---
+    // Eliminar entrada de peso
+    function removeWeightEntry(index) {
+        if (confirm("¿Estás seguro de que quieres eliminar esta entrada de peso?")) {
+            pesos.splice(index, 1);
+            savePesos();
+            displayPesoHistory();
+            updateWeightChart();
+            displayBMI();
+        }
+    }
 
-    // Gráfico de peso
-    function updateWeightChart() {
-        if (weightChartInstance) {
-            weightChartInstance.destroy(); // Destruir instancia anterior si existe
+    // Calcular y mostrar IMC
+    function displayBMI() {
+        if (userHeightInput.value) {
+            userHeight = parseFloat(userHeightInput.value);
+            saveUserHeight();
         }
 
-        // Ordenar pesos por fecha para el gráfico
-        const sortedPesos = [...pesos].sort((a, b) => new Date(a.date) - new Date(b.date));
-        const labels = sortedPesos.map(entry => entry.date);
-        const data = sortedPesos.map(entry => entry.weight);
+        if (userHeight && pesos.length > 0) {
+            const latestWeight = pesos[pesos.length - 1].weight; // Último peso registrado
+            const bmi = latestWeight / (userHeight * userHeight);
+            let category = '';
+            if (bmi < 18.5) {
+                category = 'Bajo peso';
+                bmiDisplay.className = 'underweight';
+            } else if (bmi >= 18.5 && bmi < 24.9) {
+                category = 'Normal';
+                bmiDisplay.className = 'normal';
+            } else if (bmi >= 25 && bmi < 29.9) {
+                category = 'Sobrepeso';
+                bmiDisplay.className = 'overweight';
+            } else {
+                category = 'Obeso';
+                bmiDisplay.className = 'obese';
+            }
+            bmiDisplay.textContent = `IMC: ${bmi.toFixed(2)} (${category})`;
+        } else {
+            bmiDisplay.textContent = "Introduce tu altura y registra tu peso para calcular el IMC.";
+            bmiDisplay.className = '';
+        }
+    }
+
+    // Event listener para actualizar altura
+    userHeightInput.addEventListener('change', displayBMI);
+
+
+    // --- Funciones de Gráficos (Chart.js) ---
+
+    // Gráfico de Peso
+    function updateWeightChart() {
+        if (weightChartInstance) {
+            weightChartInstance.destroy();
+        }
+
+        const dates = pesos.map(p => p.date);
+        const weights = pesos.map(p => p.weight);
 
         const ctx = document.getElementById('weightChart').getContext('2d');
         weightChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels,
+                labels: dates,
                 datasets: [{
                     label: 'Peso (kg)',
-                    data: data,
+                    data: weights,
                     borderColor: 'rgb(75, 192, 192)',
                     tension: 0.1,
                     fill: false
@@ -988,40 +962,29 @@
                 maintainAspectRatio: false,
                 scales: {
                     x: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: getComputedStyle(document.body).getPropertyValue('--text')
-                        },
-                        grid: {
-                            color: getComputedStyle(document.body).getPropertyValue('--border')
+                        type: 'category',
+                        title: {
+                            display: true,
+                            text: 'Fecha'
                         }
                     },
                     y: {
-                        beginAtZero: false,
-                        ticks: {
-                            color: getComputedStyle(document.body).getPropertyValue('--text')
+                        title: {
+                            display: true,
+                            text: 'Peso (kg)'
                         },
-                        grid: {
-                            color: getComputedStyle(document.body).getPropertyValue('--border')
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: getComputedStyle(document.body).getPropertyValue('--text')
-                        }
+                        beginAtZero: false
                     }
                 }
             }
         });
     }
 
-    // Llenar el select de ejercicios para el gráfico
+    // Llenar el dropdown de ejercicios para el gráfico de progreso
     function populateExerciseChartDropdown() {
+        const uniqueExerciseNames = [...new Set(ejerciciosSesiones.map(ej => ej.name))];
         exerciseChartSelect.innerHTML = '<option value="">Seleccione un ejercicio</option>';
-        const uniqueExercises = [...new Set(ejerciciosSesiones.map(ej => ej.name))];
-        uniqueExercises.sort().forEach(name => {
+        uniqueExerciseNames.forEach(name => {
             const option = document.createElement('option');
             option.value = name;
             option.textContent = name;
@@ -1029,34 +992,37 @@
         });
     }
 
-    // Gráfico de progreso de ejercicios
+    // Gráfico de Progreso de Ejercicios
     function updateExerciseChart() {
         if (exerciseChartInstance) {
-            exerciseChartInstance.destroy(); // Destruir instancia anterior si existe
+            exerciseChartInstance.destroy();
         }
 
         const selectedExerciseName = exerciseChartSelect.value;
         const selectedMetric = exerciseChartMetric.value;
 
-        if (!selectedExerciseName || !selectedMetric) {
-            return; // No dibujar si no hay selección completa
+        if (!selectedExerciseName) {
+            return;
         }
 
-        const filteredData = ejerciciosSesiones
-            .filter(ej => ej.name === selectedExerciseName)
-            .sort((a, b) => new Date(a.date) - new Date(b.date)); // Ordenar por fecha
+        const filteredExercises = ejerciciosSesiones.filter(ej => ej.name === selectedExerciseName)
+                                                   .sort((a, b) => new Date(a.date) - new Date(b.date));
 
-        const labels = filteredData.map(entry => entry.date);
-        const data = filteredData.map(entry => entry[selectedMetric]);
+        if (filteredExercises.length === 0) {
+            return;
+        }
+
+        const dates = filteredExercises.map(ej => ej.date);
+        const dataPoints = filteredExercises.map(ej => ej[selectedMetric]);
 
         const ctx = document.getElementById('exerciseChart').getContext('2d');
         exerciseChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: labels,
+                labels: dates,
                 datasets: [{
-                    label: `${selectedMetric.charAt(0).toUpperCase() + selectedMetric.slice(1)} de ${selectedExerciseName}`,
-                    data: data,
+                    label: `${selectedExerciseName} - ${selectedMetric === 'weight' ? 'Peso (kg)' : selectedMetric === 'reps' ? 'Repeticiones' : 'Series'}`,
+                    data: dataPoints,
                     borderColor: 'rgb(255, 99, 132)',
                     tension: 0.1,
                     fill: false
@@ -1067,29 +1033,18 @@
                 maintainAspectRatio: false,
                 scales: {
                     x: {
-                        beginAtZero: true,
-                        ticks: {
-                            color: getComputedStyle(document.body).getPropertyValue('--text')
-                        },
-                        grid: {
-                            color: getComputedStyle(document.body).getPropertyValue('--border')
+                        type: 'category',
+                        title: {
+                            display: true,
+                            text: 'Fecha'
                         }
                     },
                     y: {
-                        beginAtZero: false,
-                        ticks: {
-                            color: getComputedStyle(document.body).getPropertyValue('--text')
+                        title: {
+                            display: true,
+                            text: selectedMetric === 'weight' ? 'Peso (kg)' : selectedMetric === 'reps' ? 'Repeticiones' : 'Series'
                         },
-                        grid: {
-                            color: getComputedStyle(document.body).getPropertyValue('--border')
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        labels: {
-                            color: getComputedStyle(document.body).getPropertyValue('--text')
-                        }
+                        beginAtZero: true
                     }
                 }
             }
@@ -1100,125 +1055,125 @@
     exerciseChartMetric.addEventListener('change', updateExerciseChart);
 
 
-    // --- Funciones para la Gestión de Fotos ---
+    // --- Historial de Ejercicios Detallado ---
+    function populateExerciseHistoryDropdown() {
+        const uniqueExerciseNames = [...new Set(ejerciciosSesiones.map(ej => ej.name))];
+        exerciseHistoryDropdown.innerHTML = '<option value="">Selecciona un ejercicio para ver su historial</option>';
+        uniqueExerciseNames.forEach(name => {
+            const option = document.createElement('option');
+            option.value = name;
+            option.textContent = name;
+            exerciseHistoryDropdown.appendChild(option);
+        });
+    }
 
-    // Mostrar la última foto guardada
-    function displayLastPhoto() {
-        try {
-            const lastPhoto = localStorage.getItem('last_progress_photo');
-            if (lastPhoto) {
-                photoDisplay.src = lastPhoto;
-                photoDisplay.style.display = 'block';
-                clearPhotoBtn.style.display = 'inline-block';
-            } else {
-                photoDisplay.style.display = 'none';
-                clearPhotoBtn.style.display = 'none';
-            }
-        } catch (error) {
-            console.error("Error al cargar la foto:", error);
-            photoDisplay.style.display = 'none';
-            clearPhotoBtn.style.display = 'none';
+    exerciseHistoryDropdown.addEventListener('change', () => {
+        const selectedExerciseName = exerciseHistoryDropdown.value;
+        displayExerciseHistory(selectedExerciseName);
+    });
+
+    function displayExerciseHistory(exerciseName) {
+        exerciseHistoryDisplay.innerHTML = '';
+        if (!exerciseName) {
+            return;
+        }
+
+        const filteredHistory = ejerciciosSesiones.filter(ej => ej.name === exerciseName)
+                                               .sort((a, b) => new Date(b.date) - new Date(a.date)); // Más reciente primero
+
+        if (filteredHistory.length > 0) {
+            const ul = document.createElement('ul');
+            ul.classList.add('exercise-list'); // Reusing some styling
+            filteredHistory.forEach(entry => {
+                const li = document.createElement('li');
+                // Displaying unit in history as well
+                li.innerHTML = `
+                    <div class="exercise-info">
+                        <strong>${entry.date}</strong> - ${entry.sets}x${entry.reps} @ ${entry.weight}kg (${entry.unit || 'reps'})
+                        ${entry.notes ? `<br><em>Notas: ${entry.notes}</em>` : ''}
+                    </div>
+                `;
+                ul.appendChild(li);
+            });
+            exerciseHistoryDisplay.appendChild(ul);
+        } else {
+            exerciseHistoryDisplay.innerHTML = '<p>No hay historial para este ejercicio.</p>';
         }
     }
 
-    // Manejar la captura de la foto
-    cameraInput.addEventListener('change', (event) => {
-        const file = event.target.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                localStorage.setItem('last_progress_photo', e.target.result);
-                displayLastPhoto();
-            };
-            reader.readAsDataURL(file);
-        }
-    });
 
-    // Eliminar la foto guardada
-    clearPhotoBtn.addEventListener('click', () => {
-        if (confirm("¿Estás seguro de que quieres eliminar la última foto?")) {
-            localStorage.removeItem('last_progress_photo');
-            displayLastPhoto();
-            alert("Foto eliminada.");
-        }
-    });
-
-    // --- Funciones para el Menú Dropdown (Header) ---
+    // --- Gestión del Dropdown de Menú ---
     dropdownBtn.addEventListener('click', (event) => {
         dropdownContent.style.display = dropdownContent.style.display === "block" ? "none" : "block";
-        event.stopPropagation(); // Evitar que el clic en el botón cierre el dropdown inmediatamente
+        event.stopPropagation(); // Prevenir que el clic se propague al documento
     });
 
-    // Cerrar el dropdown si se hace clic fuera
+    // Cerrar el dropdown si se hace clic fuera de él
     window.addEventListener('click', (event) => {
         if (!event.target.matches('#dropdownBtn')) {
             hideDropdown();
         }
     });
 
-    editPlanBtn.addEventListener('click', (event) => {
-        event.preventDefault(); // Prevenir navegación por defecto
+    editPlanBtn.addEventListener('click', () => {
+        window.location.href = 'editar_dias.html';
         hideDropdown();
-        window.location.href = 'editar_dias.html'; // Navegar a la página de edición
     });
 
-    resetAppBtn.addEventListener('click', (event) => {
-        event.preventDefault(); // Prevenir navegación por defecto
-        hideDropdown();
-        if (confirm("¿Estás seguro de que quieres resetear la aplicación? Se eliminarán todos tus datos (plan de entrenamiento, historial de ejercicios, historial de peso, fotos y estado de los checkboxes). Esta acción no se puede deshacer.")) {
+    resetAppBtn.addEventListener('click', () => {
+        if (confirm("¿Estás seguro de que quieres resetear la aplicación? Se eliminarán todos tus datos (plan, historial, peso, fotos). Esta acción no se puede deshacer.")) {
             localStorage.clear();
             alert("Aplicación reseteada. Recargando...");
-            window.location.reload(); // Recargar la página para limpiar todo
+            window.location.reload();
         }
+        hideDropdown();
     });
 
     darkModeToggle.addEventListener('click', toggleDarkMode);
 
-    // --- Inicialización al Cargar la Página ---
-    document.addEventListener('DOMContentLoaded', () => {
-        applyDarkMode(); // Aplicar el modo oscuro al inicio
-        loadData(); // Cargar todos los datos
-        
-        // Cargar el plan de entrenamiento con valores por defecto si no existe
-        if (Object.keys(planEntrenamientoIndex).length === 0) {
-            planEntrenamientoIndex['day-1'] = { name: "Día 1 - Full Body Fuerza", ejercicios: [
-                { name: "Peso muerto rumano", sets: 3, reps: 8, weight: 60 },
-                { name: "Dominadas asistidas", sets: 3, reps: 10, weight: 0 },
-                { name: "Press inclinado", sets: 3, reps: 10, weight: 40 },
-                { name: "Plancha", sets: 3, reps: 60, weight: 0 }, // reps para segundos
-                { name: "Bird-dogs", sets: 3, reps: 12, weight: 0 }
-            ]};
-            planEntrenamientoIndex['day-2'] = { name: "Día 2 - Hipertrofia + Core", ejercicios: [
-                { name: "Sentadilla goblet", sets: 3, reps: 12, weight: 20 },
-                { name: "Remo con barra", sets: 3, reps: 10, weight: 30 },
-                { name: "Z-Press", sets: 3, reps: 8, weight: 15 },
-                { name: "Plancha reach", sets: 3, reps: 45, weight: 0 }, // reps para segundos
-                { name: "Hollow hold", sets: 3, reps: 30, weight: 0 } // reps para segundos
-            ]};
-            planEntrenamientoIndex['day-3'] = { name: "Día 3 - Cardio + Core", ejercicios: [
-                { name: "Caminata inclinada", sets: 1, reps: 30, weight: 0, notes: "minutos" },
-                { name: "Abdominales", sets: 3, reps: 15, weight: 0 },
-                { name: "Movilidad", sets: 1, reps: 10, weight: 0, notes: "minutos" }
-            ]};
-            planEntrenamientoIndex['day-4'] = { name: "Día 4 - Descanso", ejercicios: [] };
-            planEntrenamientoIndex['day-5'] = { name: "Día 5 - Tren Superior", ejercicios: [
-                { name: "Press de hombros", sets: 3, reps: 10, weight: 25 },
-                { name: "Remo con mancuernas", sets: 3, reps: 12, weight: 15 },
-                { name: "Flexiones", sets: 3, reps: 10, weight: 0 }
-            ]};
-            planEntrenamientoIndex['day-6'] = { name: "Día 6 - Tren Inferior", ejercicios: [
-                { name: "Sentadilla", sets: 3, reps: 8, weight: 50 },
-                { name: "Peso muerto", sets: 3, reps: 6, weight: 70 },
-                { name: "Zancadas", sets: 3, reps: 10, weight: 10 }
-            ]};
-            planEntrenamientoIndex['day-7'] = { name: "Día 7 - Actividad Ligera", ejercicios: [
-                { name: "Yoga", sets: 1, reps: 45, weight: 0, notes: "minutos" },
-                { name: "Caminata", sets: 1, reps: 60, weight: 0, notes: "minutos" }
-            ]};
-            savePlan(); // Guardar los valores por defecto
-        }
 
-        // Determinar el día actual basado en el día de la semana real si es la primera carga
+    // --- Gestión de Fotos ---
+    cameraInput.addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                photoDisplay.src = e.target.result;
+                photoDisplay.style.display = 'block';
+                clearPhotoBtn.style.display = 'inline-block';
+                localStorage.setItem('lastPhoto', e.target.result); // Guardar como base64
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function displayLastPhoto() {
+        const lastPhoto = localStorage.getItem('lastPhoto');
+        if (lastPhoto) {
+            photoDisplay.src = lastPhoto;
+            photoDisplay.style.display = 'block';
+            clearPhotoBtn.style.display = 'inline-block';
+        } else {
+            photoDisplay.style.display = 'none';
+            clearPhotoBtn.style.display = 'none';
+        }
+    }
+
+    clearPhotoBtn.addEventListener('click', () => {
+        if (confirm("¿Estás seguro de que quieres eliminar la última foto?")) {
+            localStorage.removeItem('lastPhoto');
+            displayLastPhoto();
+            alert("Última foto eliminada.");
+        }
+    });
+
+
+    // --- Inicialización al cargar la página ---
+    document.addEventListener('DOMContentLoaded', () => {
+        loadData(); // Cargar todos los datos al inicio
+        applyDarkMode(); // Aplicar el modo oscuro si está guardado
+
+        // Determinar el día actual al cargar o usar el guardado
         if (localStorage.getItem("currentDayIndex") === null) {
             const today = new Date();
             currentDay = (today.getDay() + 6) % 7; // 0=Domingo, 1=Lunes... a 0=Lunes, 1=Martes...
@@ -1228,6 +1183,7 @@
         }
         
         loadDailySessionExercises(); // Cargar los ejercicios temporales para el día actual
+        populateExerciseDatalist(); // Populate the datalist for exercise selection
         cargarEjerciciosDias(); // Cargar los ejercicios del plan diario y marcar checks
         
         displayPesoHistory(); // Cargar y mostrar el historial de peso

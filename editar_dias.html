@@ -268,6 +268,7 @@
                     <input type="number" id="newMasterExerciseSets" placeholder="Sets" value="3" min="1">
                     <input type="number" id="newMasterExerciseReps" placeholder="Reps" value="10" min="1">
                     <input type="number" id="newMasterExerciseWeight" placeholder="Peso (kg)" value="0" step="0.1">
+                    <input type="text" id="newMasterExerciseUnit" placeholder="Unidad (ej. reps, segundos)" value="reps">
                     <button id="addMasterExerciseBtn">Añadir Maestro</button>
                 </div>
             </div>
@@ -330,10 +331,38 @@
             </div>
         </div>
     </div>
-
     <script>
         let planEntrenamiento = {}; // Almacena el plan de entrenamiento semanal
         let masterExercises = []; // Lista maestra de todos los ejercicios disponibles
+
+        // Define the master exercise list with default units
+        const initialMasterExerciseList = [
+            { name: "Press de Banca", sets: 3, reps: 10, weight: 50, unit: "reps" },
+            { name: "Sentadilla", sets: 4, reps: 8, weight: 60, unit: "reps" },
+            { name: "Peso Muerto", sets: 3, reps: 5, weight: 80, unit: "reps" },
+            { name: "Dominadas", sets: 3, reps: 8, weight: 0, unit: "reps" },
+            { name: "Remo con Barra", sets: 3, reps: 10, weight: 40, unit: "reps" },
+            { name: "Press Militar", sets: 3, reps: 10, weight: 30, unit: "reps" },
+            { name: "Elevaciones Laterales", sets: 3, reps: 15, weight: 5, unit: "reps" },
+            { name: "Pájaros", sets: 3, reps: 15, weight: 5, unit: "reps" },
+            { name: "Face Pull", sets: 3, reps: 15, weight: 10, unit: "reps" },
+            { name: "Plancha", sets: 3, reps: 60, weight: 0, unit: "segundos" }, // Reps como segundos
+            { name: "Crunch", sets: 3, reps: 20, weight: 0, unit: "reps" },
+            { name: "Elevación de Piernas", sets: 3, reps: 15, weight: 0, unit: "reps" },
+            { name: "Hollow Hold", sets: 3, reps: 30, weight: 0, unit: "segundos" }, // Reps como segundos
+            { name: "Bird-dog", sets: 3, reps: 12, weight: 0, unit: "reps" },
+            { name: "Caminata Inclinada", sets: 1, reps: 30, weight: 0, unit: "minutos" }, // Reps como minutos
+            { name: "Burpees", sets: 3, reps: 10, weight: 0, unit: "reps" },
+            { name: "Saltos de Caja", sets: 3, reps: 10, weight: 0, unit: "reps" },
+            { name: "Sentadilla Búlgara", sets: 3, reps: 10, weight: 10, unit: "reps" },
+            { name: "Hip Thrust", sets: 3, reps: 3, weight: 60, unit: "reps" },
+            { name: "Press Francés", sets: 3, reps: 12, weight: 20, unit: "reps" },
+            { name: "Extensiones de Tríceps en Polea", sets: 3, reps: 15, weight: 15, unit: "reps" },
+            { name: "Curl de Bíceps con Barra", sets: 3, reps: 12, weight: 25, unit: "reps" },
+            { name: "Curl de Martillo", sets: 3, reps: 12, weight: 10, unit: "reps" },
+            { name: "Elevación de Gemelos", sets: 4, reps: 15, weight: 30, unit: "reps" }
+        ];
+
 
         // --- Funciones de Utilidad ---
         function savePlan() {
@@ -347,7 +376,12 @@
 
         function loadData() {
             planEntrenamiento = JSON.parse(localStorage.getItem("planEntrenamiento")) || {};
-            masterExercises = JSON.parse(localStorage.getItem("masterExercises")) || [];
+            masterExercises = JSON.parse(localStorage.getItem("masterExercises"));
+            // If no master exercises are stored, initialize with the predefined list
+            if (!masterExercises || masterExercises.length === 0) {
+                masterExercises = initialMasterExerciseList;
+                saveMasterExercises();
+            }
         }
 
         // Aplicar modo oscuro al cargar (para que coincida con index.html)
@@ -365,9 +399,9 @@
             masterList.innerHTML = '';
             masterExercises.forEach((exercise, index) => {
                 const li = document.createElement('li');
-                // Display name and default metrics
+                // Display name and default metrics, including unit
                 const exerciseDetails = exercise.sets && exercise.reps && exercise.weight !== undefined ?
-                                        ` (${exercise.sets}x${exercise.reps} @ ${exercise.weight}kg)` : '';
+                    ` (${exercise.sets}x${exercise.reps} @ ${exercise.weight}kg, ${exercise.unit || 'reps'})` : '';
                 li.innerHTML = `
                     <span>${exercise.name}${exerciseDetails}</span>
                     <button onclick="removeMasterExercise(${index})" class="danger">Eliminar</button>
@@ -383,19 +417,21 @@
             const setsInput = document.getElementById('newMasterExerciseSets');
             const repsInput = document.getElementById('newMasterExerciseReps');
             const weightInput = document.getElementById('newMasterExerciseWeight');
+            const unitInput = document.getElementById('newMasterExerciseUnit'); // Get the new unit input
 
             const newName = nameInput.value.trim();
             const newSets = parseInt(setsInput.value);
             const newReps = parseInt(repsInput.value);
             const newWeight = parseFloat(weightInput.value);
-
+            const newUnit = unitInput.value.trim() || 'reps'; // Default to 'reps' if empty
 
             if (newName && !masterExercises.some(ex => ex.name.toLowerCase() === newName.toLowerCase())) {
                 masterExercises.push({
                     name: newName,
                     sets: isNaN(newSets) ? 3 : newSets,
                     reps: isNaN(newReps) ? 10 : newReps,
-                    weight: isNaN(newWeight) ? 0 : newWeight
+                    weight: isNaN(newWeight) ? 0 : newWeight,
+                    unit: newUnit // Save the unit
                 });
                 saveMasterExercises();
                 populateMasterExerciseList();
@@ -403,6 +439,7 @@
                 setsInput.value = '3';
                 repsInput.value = '10';
                 weightInput.value = '0';
+                unitInput.value = 'reps'; // Reset unit input
             } else if (newName) {
                 alert("Este ejercicio ya existe en la lista maestra o el nombre es inválido.");
             } else {
@@ -415,8 +452,47 @@
                 masterExercises.splice(index, 1);
                 saveMasterExercises();
                 populateMasterExerciseList();
+                // Also remove from any daily plans if it exists there
+                for (const dayKey in planEntrenamiento) {
+                    if (planEntrenamiento.hasOwnProperty(dayKey)) {
+                        planEntrenamiento[dayKey].ejercicios = planEntrenamiento[dayKey].ejercicios.filter(
+                            ex => ex.name !== masterExercises[index].name // This will be problematic if the index changes. Better filter by original name before splice.
+                        );
+                    }
+                }
+                savePlan();
+                populateAllDayExercises(); // Repopulate all days to reflect changes
             }
         }
+        
+        // This function needs to be adjusted to filter by the *name* of the exercise being removed,
+        // as the index in masterExercises changes after splice.
+        // Let's refine removeMasterExercise logic and then update populateAllDayExercises if needed.
+        function removeMasterExerciseByName(exerciseName) {
+            // First, find the index to get the exercise details for confirmation
+            const indexToRemove = masterExercises.findIndex(ex => ex.name === exerciseName);
+            if (indexToRemove === -1) return; // Not found
+
+            if (confirm(`¿Estás seguro de que quieres eliminar "${exerciseName}" de la lista maestra? Esto también lo eliminará de cualquier plan semanal donde se use.`)) {
+                masterExercises.splice(indexToRemove, 1);
+                saveMasterExercises();
+                populateMasterExerciseList();
+
+                // Now, remove it from all daily plans
+                for (const dayKey in planEntrenamiento) {
+                    if (planEntrenamiento.hasOwnProperty(dayKey)) {
+                        planEntrenamiento[dayKey].ejercicios = planEntrenamiento[dayKey].ejercicios.filter(
+                            ex => ex.name !== exerciseName
+                        );
+                    }
+                }
+                savePlan();
+                populateAllDayExercises(); // Repopulate all days to reflect changes
+            }
+        }
+        // Update the event listener in populateMasterExerciseList to call this new function
+        // (This will be done after the `editar_dias.html` code is fully constructed and replacing the old one.)
+
 
         // --- Funciones para el Plan Semanal ---
 
@@ -438,203 +514,157 @@
         function populateDayExercises(dayKey) {
             const ul = document.getElementById(`${dayKey}-exercises`);
             ul.innerHTML = '';
-            // Asegurarse de que el objeto del día existe y tiene una propiedad 'ejercicios'
-            if (!planEntrenamiento[dayKey] || !planEntrenamiento[dayKey].ejercicios) {
-                planEntrenamiento[dayKey] = { name: `Día ${dayKey.split('-')[1]}`, ejercicios: [] };
-            }
-
-            planEntrenamiento[dayKey].ejercicios.forEach((exercise, index) => {
-                const li = document.createElement('li');
-                // Display name and default metrics
-                const exerciseDetails = exercise.sets && exercise.reps && exercise.weight !== undefined ?
-                                        ` (${exercise.sets}x${exercise.reps} @ ${exercise.weight}kg)` : '';
-                li.innerHTML = `
-                    <div class="exercise-details">
-                        <span>${exercise.name}${exerciseDetails}</span>
-                        <div class="edit-inputs" style="display: none;">
-                            <input type="number" placeholder="Sets" value="${exercise.sets || ''}" onchange="updateExerciseDetail('${dayKey}', ${index}, 'sets', this.value)">
-                            <input type="number" placeholder="Reps" value="${exercise.reps || ''}" onchange="updateExerciseDetail('${dayKey}', ${index}, 'reps', this.value)">
-                            <input type="number" placeholder="Peso" value="${exercise.weight || ''}" step="0.1" onchange="updateExerciseDetail('${dayKey}', ${index}, 'weight', this.value)">
+            const dayPlan = planEntrenamiento[dayKey];
+            if (dayPlan && dayPlan.ejercicios) {
+                dayPlan.ejercicios.forEach((ejercicio, index) => {
+                    const li = document.createElement('li');
+                    const exerciseDetails = ejercicio.sets && ejercicio.reps && ejercicio.weight !== undefined ?
+                        ` (${ejercicio.sets}x${ejercicio.reps} @ ${ejercicio.weight}kg, ${ejercicio.unit || 'reps'})` : '';
+                    li.innerHTML = `
+                        <div class="exercise-details">
+                            ${ejercicio.name}${exerciseDetails}
                         </div>
-                    </div>
-                    <div class="exercise-actions">
-                        <button onclick="toggleEditInputs(this)">Editar</button>
-                        <button onclick="removeExerciseFromDay('${dayKey}', ${index})" class="danger">X</button>
-                    </div>
-                `;
-                ul.appendChild(li);
-            });
-
-            // Actualizar el título del día
-            const dayIndex = dayKey.split('-')[1];
-            const h3 = ul.previousElementSibling; // El h3 está antes del ul
-            if (h3 && h3.tagName === 'H3') {
-                h3.innerHTML = `${planEntrenamiento[dayKey].name || `Día ${dayIndex}`} <button onclick="clearDay('${dayKey}')" class="danger">Limpiar</button>`;
+                        <div class="exercise-actions">
+                            <button onclick="editExercise('${dayKey}', ${index})">Editar</button>
+                            <button onclick="removeExercise('${dayKey}', ${index})" class="danger">Eliminar</button>
+                        </div>
+                    `;
+                    ul.appendChild(li);
+                });
             }
         }
 
-        function toggleEditInputs(button) {
-            const editInputsDiv = button.parentNode.previousElementSibling.querySelector('.edit-inputs');
-            if (editInputsDiv) {
-                editInputsDiv.style.display = editInputsDiv.style.display === 'none' ? 'block' : 'none';
-                button.textContent = editInputsDiv.style.display === 'none' ? 'Editar' : 'Cerrar';
+        // Función para poblar todos los días al cargar la página
+        function populateAllDayExercises() {
+            for (let i = 1; i <= 7; i++) {
+                populateDayExercises(`day-${i}`);
+                updateDayNameDisplay(`day-${i}`); // Update day name
             }
         }
 
-        function updateExerciseDetail(dayKey, index, detailType, value) {
-            if (planEntrenamiento[dayKey] && planEntrenamiento[dayKey].ejercicios[index]) {
-                if (detailType === 'weight') {
-                    planEntrenamiento[dayKey].ejercicios[index][detailType] = parseFloat(value);
-                } else {
-                    planEntrenamiento[dayKey].ejercicios[index][detailType] = parseInt(value);
-                }
-                populateDayExercises(dayKey); // Recargar para mostrar el cambio
-                savePlan(); // Guardar el plan con el cambio
-            }
-        }
-
-
-        // Añadir un ejercicio a un día específico
+        // Función para añadir un ejercicio a un día
         function addExerciseToDay(dayKey) {
             const select = document.getElementById(`add-${dayKey}-exercise-select`);
             const selectedExerciseName = select.value;
 
             if (selectedExerciseName) {
-                // Encontrar el ejercicio completo de la lista maestra
                 const selectedMasterExercise = masterExercises.find(ex => ex.name === selectedExerciseName);
 
                 if (selectedMasterExercise) {
-                    // Si el ejercicio ya está en el día, no lo añadas de nuevo
-                    if (planEntrenamiento[dayKey].ejercicios.some(ej => ej.name === selectedExerciseName)) {
-                        alert("Este ejercicio ya está en la lista de este día.");
-                        return;
+                    // Create a copy to avoid modifying the master exercise directly
+                    const exerciseToAdd = { ...selectedMasterExercise };
+
+                    if (!planEntrenamiento[dayKey]) {
+                        planEntrenamiento[dayKey] = {
+                            name: `Día ${dayKey.split('-')[1]}`, // Default name
+                            ejercicios: []
+                        };
                     }
-                    // Añadir una COPIA del objeto para que las modificaciones de este día no afecten al maestro
-                    planEntrenamiento[dayKey].ejercicios.push(JSON.parse(JSON.stringify(selectedMasterExercise)));
-                    populateDayExercises(dayKey);
-                    select.value = ""; // Resetear el select
-                    savePlan();
+
+                    // Check for duplicates before adding
+                    if (!planEntrenamiento[dayKey].ejercicios.some(ex => ex.name === exerciseToAdd.name)) {
+                        planEntrenamiento[dayKey].ejercicios.push(exerciseToAdd);
+                        savePlan();
+                        populateDayExercises(dayKey);
+                        select.value = ""; // Reset select
+                    } else {
+                        alert("Este ejercicio ya existe en el plan para este día.");
+                    }
                 }
             } else {
                 alert("Por favor, selecciona un ejercicio para añadir.");
             }
         }
 
-        // Eliminar un ejercicio de un día específico
-        function removeExerciseFromDay(dayKey, index) {
-            if (confirm(`¿Estás seguro de que quieres eliminar "${planEntrenamiento[dayKey].ejercicios[index].name}" de este día?`)) {
+        // Función para editar un ejercicio de un día
+        function editExercise(dayKey, index) {
+            const dayPlan = planEntrenamiento[dayKey];
+            if (dayPlan && dayPlan.ejercicios && dayPlan.ejercicios[index]) {
+                const exercise = dayPlan.ejercicios[index];
+                const newName = prompt("Editar nombre del ejercicio:", exercise.name);
+                if (newName !== null) {
+                    const newSets = prompt("Editar series:", exercise.sets);
+                    const newReps = prompt("Editar repeticiones:", exercise.reps);
+                    const newWeight = prompt("Editar peso (kg):", exercise.weight);
+                    const newUnit = prompt("Editar unidad (reps, segundos, minutos):", exercise.unit || 'reps');
+
+                    if (newName.trim() !== "") {
+                        exercise.name = newName.trim();
+                        exercise.sets = newSets !== null ? parseInt(newSets) : exercise.sets;
+                        exercise.reps = newReps !== null ? parseInt(newReps) : exercise.reps;
+                        exercise.weight = newWeight !== null ? parseFloat(newWeight) : exercise.weight;
+                        exercise.unit = newUnit !== null ? newUnit.trim() : exercise.unit;
+                        savePlan();
+                        populateDayExercises(dayKey);
+                    } else {
+                        alert("El nombre del ejercicio no puede estar vacío.");
+                    }
+                }
+            }
+        }
+
+        // Función para eliminar un ejercicio de un día
+        function removeExercise(dayKey, index) {
+            if (confirm("¿Estás seguro de que quieres eliminar este ejercicio de este día?")) {
                 planEntrenamiento[dayKey].ejercicios.splice(index, 1);
-                populateDayExercises(dayKey);
                 savePlan();
+                populateDayExercises(dayKey);
             }
         }
 
-        // Limpiar todos los ejercicios de un día
+        // Función para limpiar todos los ejercicios de un día
         function clearDay(dayKey) {
-            if (confirm(`¿Estás seguro de que quieres limpiar todos los ejercicios del ${planEntrenamiento[dayKey].name}?`)) {
-                planEntrenamiento[dayKey].ejercicios = [];
-                populateDayExercises(dayKey);
-                savePlan();
+            if (confirm(`¿Estás seguro de que quieres limpiar todos los ejercicios del ${dayKey}?`)) {
+                if (planEntrenamiento[dayKey]) {
+                    planEntrenamiento[dayKey].ejercicios = [];
+                    savePlan();
+                    populateDayExercises(dayKey);
+                }
             }
         }
 
-        // Editar el nombre de un día
+        // Función para editar el nombre de un día
         function editDayName(dayKey) {
-            const currentName = planEntrenamiento[dayKey].name || `Día ${dayKey.split('-')[1]}`;
-            const newName = prompt(`Introduce el nuevo nombre para ${currentName}:`, currentName);
+            const currentName = planEntrenamiento[dayKey] ? planEntrenamiento[dayKey].name : `Día ${dayKey.split('-')[1]}`;
+            const newName = prompt("Editar nombre del día:", currentName);
             if (newName !== null && newName.trim() !== "") {
+                if (!planEntrenamiento[dayKey]) {
+                    planEntrenamiento[dayKey] = { ejercicios: [] };
+                }
                 planEntrenamiento[dayKey].name = newName.trim();
-                populateDayExercises(dayKey); // Recargar para actualizar el nombre
                 savePlan();
+                updateDayNameDisplay(dayKey);
+            } else if (newName !== null) {
+                alert("El nombre del día no puede estar vacío.");
             }
         }
 
-        // --- Inicialización al Cargar la Página ---
+        function updateDayNameDisplay(dayKey) {
+            const dayColumn = document.querySelector(`.day-column h3 button[onclick="clearDay('${dayKey}')"]`).parentNode;
+            const dayNumber = dayKey.split('-')[1];
+            dayColumn.childNodes[0].nodeValue = planEntrenamiento[dayKey] && planEntrenamiento[dayKey].name ? planEntrenamiento[dayKey].name + ' ' : `Día ${dayNumber} `;
+        }
+
+
+        // --- Inicialización ---
         document.addEventListener('DOMContentLoaded', () => {
-            applyDarkMode();
             loadData();
-
-            // Valores por defecto para el plan de entrenamiento si no existe
-            if (Object.keys(planEntrenamiento).length === 0) {
-                planEntrenamiento['day-1'] = { name: "Día 1 - Full Body Fuerza", ejercicios: [
-                    { name: "Peso muerto rumano", sets: 3, reps: 8, weight: 60 },
-                    { name: "Dominadas asistidas", sets: 3, reps: 10, weight: 0 },
-                    { name: "Press inclinado", sets: 3, reps: 10, weight: 40 },
-                    { name: "Plancha", sets: 3, reps: 60, weight: 0 }, // reps para segundos
-                    { name: "Bird-dogs", sets: 3, reps: 12, weight: 0 }
-                ]};
-                planEntrenamiento['day-2'] = { name: "Día 2 - Hipertrofia + Core", ejercicios: [
-                    { name: "Sentadilla goblet", sets: 3, reps: 12, weight: 20 },
-                    { name: "Remo con barra", sets: 3, reps: 10, weight: 30 },
-                    { name: "Z-Press", sets: 3, reps: 8, weight: 15 },
-                    { name: "Plancha reach", sets: 3, reps: 45, weight: 0 }, // reps para segundos
-                    { name: "Hollow hold", sets: 3, reps: 30, weight: 0 } // reps para segundos
-                ]};
-                planEntrenamiento['day-3'] = { name: "Día 3 - Cardio + Core", ejercicios: [
-                    { name: "Caminata inclinada", sets: 1, reps: 30, weight: 0, notes: "minutos" },
-                    { name: "Abdominales", sets: 3, reps: 15, weight: 0 },
-                    { name: "Movilidad", sets: 1, reps: 10, weight: 0, notes: "minutos" }
-                ]};
-                planEntrenamiento['day-4'] = { name: "Día 4 - Descanso", ejercicios: [] };
-                planEntrenamiento['day-5'] = { name: "Día 5 - Tren Superior", ejercicios: [
-                    { name: "Press de hombros", sets: 3, reps: 10, weight: 25 },
-                    { name: "Remo con mancuernas", sets: 3, reps: 12, weight: 15 },
-                    { name: "Flexiones", sets: 3, reps: 10, weight: 0 }
-                ]};
-                planEntrenamiento['day-6'] = { name: "Día 6 - Tren Inferior", ejercicios: [
-                    { name: "Sentadilla", sets: 3, reps: 8, weight: 50 },
-                    { name: "Peso muerto", sets: 3, reps: 6, weight: 70 },
-                    { name: "Zancadas", sets: 3, reps: 10, weight: 10 }
-                ]};
-                planEntrenamiento['day-7'] = { name: "Día 7 - Actividad Ligera", ejercicios: [
-                    { name: "Yoga", sets: 1, reps: 45, weight: 0, notes: "minutos" },
-                    { name: "Caminata", sets: 1, reps: 60, weight: 0, notes: "minutos" }
-                ]};
-                savePlan();
-            }
-
-            // Valores por defecto para el listado maestro si no existe
-            if (masterExercises.length === 0) {
-                masterExercises = [
-                    { name: "Sentadilla", sets: 3, reps: 10, weight: 50 },
-                    { name: "Peso Muerto", sets: 3, reps: 5, weight: 70 },
-                    { name: "Press Banca", sets: 3, reps: 8, weight: 60 },
-                    { name: "Press Militar", sets: 3, reps: 8, weight: 30 },
-                    { name: "Remo con Barra", sets: 3, reps: 10, weight: 40 },
-                    { name: "Dominadas", sets: 3, reps: 8, weight: 0 },
-                    { name: "Fondos", sets: 3, reps: 10, weight: 0 },
-                    { name: "Curl de Bíceps", sets: 3, reps: 12, weight: 10 },
-                    { name: "Extensión de Tríceps", sets: 3, reps: 12, weight: 10 },
-                    { name: "Press Inclinado", sets: 3, reps: 10, weight: 40 },
-                    { name: "Sentadilla Goblet", sets: 3, reps: 12, weight: 20 },
-                    { name: "Zancadas", sets: 3, reps: 10, weight: 10 },
-                    { name: "Prensa de Piernas", sets: 3, reps: 12, weight: 80 },
-                    { name: "Extensiones de Cuádriceps", sets: 3, reps: 15, weight: 30 },
-                    { name: "Curl Femoral", sets: 3, reps: 15, weight: 30 },
-                    { name: "Elevaciones Laterales", sets: 3, reps: 15, weight: 5 },
-                    { name: "Pájaros", sets: 3, reps: 15, weight: 5 },
-                    { name: "Face Pull", sets: 3, reps: 15, weight: 10 },
-                    { name: "Plancha", sets: 3, reps: 60, weight: 0 }, // Reps como segundos
-                    { name: "Crunch", sets: 3, reps: 20, weight: 0 },
-                    { name: "Elevación de Piernas", sets: 3, reps: 15, weight: 0 },
-                    { name: "Hollow Hold", sets: 3, reps: 30, weight: 0 }, // Reps como segundos
-                    { name: "Bird-dog", sets: 3, reps: 12, weight: 0 },
-                    { name: "Caminata Inclinada", sets: 1, reps: 30, weight: 0 }, // Reps como minutos
-                    { name: "Burpees", sets: 3, reps: 10, weight: 0 },
-                    { name: "Saltos de Caja", sets: 3, reps: 10, weight: 0 },
-                    { name: "Sentadilla Búlgara", sets: 3, reps: 10, weight: 10 },
-                    { name: "Hip Thrust", sets: 3, reps: 3, weight: 60 },
-                    { name: "Press Francés", sets: 3, reps: 12, weight: 15 }
-                ];
-                saveMasterExercises();
-            }
-
+            applyDarkMode();
             populateMasterExerciseList();
-            for (let i = 1; i <= 7; i++) {
-                populateDayExercises(`day-${i}`);
-            }
+            populateAllDayExercises();
 
             document.getElementById('savePlanBtn').addEventListener('click', savePlan);
+
+            // Update removeMasterExercise to use the new function
+            // Re-populate master list to ensure correct event listeners
+            const masterListElement = document.getElementById('masterExerciseList');
+            masterListElement.addEventListener('click', (event) => {
+                if (event.target.tagName === 'BUTTON' && event.target.textContent === 'Eliminar') {
+                    const listItem = event.target.closest('li');
+                    const exerciseName = listItem.querySelector('span').textContent.split('(')[0].trim();
+                    removeMasterExerciseByName(exerciseName);
+                }
+            });
         });
     </script>
 </body>
